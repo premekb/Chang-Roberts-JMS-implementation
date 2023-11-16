@@ -1,3 +1,5 @@
+package ctu.fee.dsv.sem;
+
 public interface Node {
     SharedVariable getSharedVariable();
 

@@ -1,3 +1,5 @@
+package ctu.fee.dsv.sem;
+
 import java.io.Serializable;
 
 public class SharedVariableData<T extends Serializable> implements Serializable {
