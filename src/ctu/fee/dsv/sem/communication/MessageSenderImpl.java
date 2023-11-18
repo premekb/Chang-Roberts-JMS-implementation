@@ -1,11 +1,18 @@
 package ctu.fee.dsv.sem.communication;
 
+import ctu.fee.dsv.sem.Neighbours;
+import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.communication.messages.Message;
 
 import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Session;
 
 public class MessageSenderImpl implements MessageSender {
-    private final Connection connection;
+
+    private final Session session;
+
+    private final NodeAddress senderAddress;
 
     private MessageProducer producerForNext;
 
@@ -15,9 +22,13 @@ public class MessageSenderImpl implements MessageSender {
 
     private MessageProducer producerForLeader;
 
-    public MessageSenderImpl(Connection connection) {
-        this.connection = connection;
-    }
+    public MessageSenderImpl(Session session, NodeAddress senderAddress, Neighbours neighbours) {
+        this.session = session;
+        this.senderAddress = senderAddress;
+        producerForNext = new MessageProducerImpl(session, senderAddress, neighbours.next);
+        producerForNextNext = new MessageProducerImpl(session, senderAddress, neighbours.nnext);
+        producerForPrev = new MessageProducerImpl(session, senderAddress, neighbours.prev);
+        producerForLeader = new MessageProducerImpl(session, senderAddress, neighbours.leader);}
 
     @Override
     public void sendMessageToNext(Message message) {
@@ -39,19 +50,8 @@ public class MessageSenderImpl implements MessageSender {
         producerForLeader.sendMessage(message);
     }
 
-    public MessageProducer getProducerForNext() {
-        return producerForNext;
-    }
-
-    public MessageProducer getProducerForNextNext() {
-        return producerForNextNext;
-    }
-
-    public MessageProducer getProducerForPrev() {
-        return producerForPrev;
-    }
-
-    public MessageProducer getProducerForLeader() {
-        return producerForLeader;
+    @Override
+    public void sendMessageToAddress(Message message, NodeAddress destinationAddress) {
+        new MessageProducerImpl(session, senderAddress, destinationAddress).sendMessage(message);
     }
 }

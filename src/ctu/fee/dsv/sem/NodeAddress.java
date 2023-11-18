@@ -1,21 +1,29 @@
 package ctu.fee.dsv.sem;
 
-public class NodeAddress {
+import java.io.Serializable;
 
-    private final String hostname;
+public class NodeAddress implements Serializable {
 
-    private final Integer port;
+    private final Integer nodeId;
 
-    public NodeAddress(String hostname, Integer port) {
-        this.hostname = hostname;
-        this.port = port;
+    private final String nodeName;
+
+
+    public NodeAddress(String nodeName, Integer nodeId) {
+        this.nodeId = nodeId;
+        this.nodeName = nodeName;
     }
 
-    public String getHostname() {
-        return hostname;
+    public Integer getNodeId() {
+        return nodeId;
     }
 
-    public Integer getPort() {
-        return port;
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    @Override
+    public String toString() {
+        return "Node: " + nodeName + " " + nodeId;
     }
 }

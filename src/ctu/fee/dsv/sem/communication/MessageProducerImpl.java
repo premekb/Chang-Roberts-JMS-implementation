@@ -30,9 +30,6 @@ public class MessageProducerImpl implements MessageProducer{
             ObjectMessage objectMessage = jmsSession.createObjectMessage();
             objectMessage.setObject(message);
 
-            TextMessage myTextMsg = jmsSession.createTextMessage();
-            myTextMsg.setText("Message from producer-" + " with #");
-
             jmsProducer.send(objectMessage);
             log.info("Sent a message: " + message.toString());
         } catch (JMSException e) {

@@ -1,6 +1,5 @@
 package ctu.fee.dsv.sem;
 
-import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.ConnectionFactory;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.MessageConsumer;
@@ -8,13 +7,12 @@ import ctu.fee.dsv.sem.communication.MessageConsumerImpl;
 import ctu.fee.dsv.sem.communication.MessageProducerImpl;
 import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
 
-import javax.jms.*;
-import javax.naming.InitialContext;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Session;
 import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactoryBuilder;
-import java.util.Properties;
 
-public class Application {
+public class Test {
 
     private static final String IMQ_BROKER_HOST_NAME_KEY = "imqBrokerHostName";
 

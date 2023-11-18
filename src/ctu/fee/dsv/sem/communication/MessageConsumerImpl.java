@@ -26,8 +26,13 @@ public class MessageConsumerImpl implements MessageConsumer {
 
     @Override
     public Message tryGetMessage() {
+        return tryGetMessage(100);
+    }
+
+    @Override
+    public Message tryGetMessage(long millisecondsToWait) {
         try {
-            javax.jms.Message jmsMessage = jmsConsumer.receive(100);
+            javax.jms.Message jmsMessage = jmsConsumer.receive(millisecondsToWait);
             if (jmsMessage == null) return null;
 
             Object object = ((ObjectMessage) jmsMessage).getObject();

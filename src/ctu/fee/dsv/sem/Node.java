@@ -1,5 +1,7 @@
 package ctu.fee.dsv.sem;
 
+import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
+
 public interface Node {
     SharedVariable getSharedVariable();
 
@@ -8,6 +10,4 @@ public interface Node {
     void terminateWithLogout();
 
     void terminateWithoutLogout();
-
-    void login();
 }
