@@ -2,9 +2,9 @@ package ctu.fee.dsv.sem;
 
 import com.sun.messaging.ConnectionFactory;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
-import ctu.fee.dsv.sem.communication.MessageConsumer;
-import ctu.fee.dsv.sem.communication.MessageConsumerImpl;
-import ctu.fee.dsv.sem.communication.MessageProducerImpl;
+import ctu.fee.dsv.sem.communication.wrapper.MessageConsumer;
+import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
+import ctu.fee.dsv.sem.communication.wrapper.MessageProducerImpl;
 import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
 
 import javax.jms.Connection;

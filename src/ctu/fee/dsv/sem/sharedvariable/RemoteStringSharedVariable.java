@@ -1,6 +1,6 @@
 package ctu.fee.dsv.sem.sharedvariable;
 
-import ctu.fee.dsv.sem.communication.MessageSender;
+import ctu.fee.dsv.sem.communication.facade.MessageSender;
 import ctu.fee.dsv.sem.communication.messages.SetSharedVariableMessage;
 
 import java.io.Serializable;

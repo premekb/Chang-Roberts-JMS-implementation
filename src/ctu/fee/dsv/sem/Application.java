@@ -1,18 +1,10 @@
 package ctu.fee.dsv.sem;
 
-import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.ConnectionFactory;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
-import ctu.fee.dsv.sem.communication.MessageConsumer;
-import ctu.fee.dsv.sem.communication.MessageConsumerImpl;
-import ctu.fee.dsv.sem.communication.MessageProducerImpl;
-import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
 
 import javax.jms.*;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactoryBuilder;
-import java.util.Properties;
 
 public class Application {
 
@@ -24,15 +16,8 @@ public class Application {
         Connection connection = initJmsConnection();
         Session session = connection.createSession();
 
-        NodeAddress thisNodeAddress = new NodeAddress("okok", 100);
-        NodeAddress receiverNodeAddress = new NodeAddress("cau", 200);
-        MessageProducerImpl producer = new MessageProducerImpl(session, thisNodeAddress, thisNodeAddress);
-        producer.sendMessage(new GetSharedVariableMessage());
-
-        Thread.sleep(1000);
-
-        MessageConsumer consumer = new MessageConsumerImpl(session, thisNodeAddress, thisNodeAddress);
-        System.out.println(consumer.tryGetMessage());
+        Node node = new NodeImpl(nodeCfg, session);
+        node.run();
 
         connection.close();
         session.close();

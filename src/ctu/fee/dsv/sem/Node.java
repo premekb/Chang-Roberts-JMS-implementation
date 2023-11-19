@@ -2,7 +2,7 @@ package ctu.fee.dsv.sem;
 
 import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
 
-public interface Node {
+public interface Node extends Runnable {
     SharedVariable getSharedVariable();
 
     void setSharedVariable(SharedVariable data);
@@ -10,4 +10,8 @@ public interface Node {
     void terminateWithLogout();
 
     void terminateWithoutLogout();
+
+    NodeAddress getNodeAddress();
+
+    Neighbours getNeighbours();
 }

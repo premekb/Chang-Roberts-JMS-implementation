@@ -1,13 +1,10 @@
-package ctu.fee.dsv.sem.communication;
+package ctu.fee.dsv.sem.communication.wrapper;
 
 import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.communication.util.QueueNameUtil;
 
-import javax.jms.JMSException;
-import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.Session;
+import javax.jms.*;
 import java.util.logging.Logger;
 
 public class MessageConsumerImpl implements MessageConsumer {
@@ -42,6 +39,15 @@ public class MessageConsumerImpl implements MessageConsumer {
         } catch (JMSException e) {
             log.severe("Failed to process message. " + e.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public void setMessageListener(MessageListener messageListener) {
+        try {
+            jmsConsumer.setMessageListener(messageListener);
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
         }
     }
 }

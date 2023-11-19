@@ -1,11 +1,11 @@
-package ctu.fee.dsv.sem.communication;
+package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.Neighbours;
 import ctu.fee.dsv.sem.NodeAddress;
+import ctu.fee.dsv.sem.communication.wrapper.MessageProducer;
+import ctu.fee.dsv.sem.communication.wrapper.MessageProducerImpl;
 import ctu.fee.dsv.sem.communication.messages.Message;
 
-import javax.jms.Connection;
-import javax.jms.JMSException;
 import javax.jms.Session;
 
 public class MessageSenderImpl implements MessageSender {

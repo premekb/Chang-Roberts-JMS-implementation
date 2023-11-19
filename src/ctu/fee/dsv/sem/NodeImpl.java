@@ -1,15 +1,16 @@
 package ctu.fee.dsv.sem;
 
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
-import ctu.fee.dsv.sem.communication.MessageConsumerImpl;
-import ctu.fee.dsv.sem.communication.MessageSender;
-import ctu.fee.dsv.sem.communication.MessageSenderImpl;
+import ctu.fee.dsv.sem.communication.facade.MessageReceiver;
+import ctu.fee.dsv.sem.communication.facade.MessageReceiverImpl;
+import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
+import ctu.fee.dsv.sem.communication.facade.MessageSender;
+import ctu.fee.dsv.sem.communication.facade.MessageSenderImpl;
 import ctu.fee.dsv.sem.communication.messages.LoginMessage;
 import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.jms.Connection;
 import javax.jms.Session;
 import java.util.logging.Logger;
 
@@ -26,6 +27,8 @@ public class NodeImpl implements Node, Runnable {
 
     private final MessageSender messageSender;
 
+    private final MessageReceiver messageReceiver;
+
     private final Session session;
 
     public NodeImpl(NodeConfiguration cfg, Session session) {
@@ -34,6 +37,7 @@ public class NodeImpl implements Node, Runnable {
         initialNodeAddress = new NodeAddress(cfg.getLoginNodeName(), cfg.getLoginNodeId());
         neighbours = new Neighbours(address);
         this.messageSender = new MessageSenderImpl(session, address, neighbours);
+        this.messageReceiver = new MessageReceiverImpl(this, session);
     }
 
 
@@ -41,6 +45,15 @@ public class NodeImpl implements Node, Runnable {
     public void run() {
         // tady jsou neighbours sami na sebe
         login();
+        messageReceiver.startListeningToMessages();
+        while (true)
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -72,7 +85,7 @@ public class NodeImpl implements Node, Runnable {
         messageSender.sendMessageToAddress(new LoginMessage(address), initialNodeAddress);
 
         MessageConsumerImpl consumer = new MessageConsumerImpl(session, initialNodeAddress, address);
-        Message response = consumer.tryGetMessage(5000);
+        Message response = consumer.tryGetMessage(500);
 
         if (response == null)
         {
@@ -82,7 +95,17 @@ public class NodeImpl implements Node, Runnable {
         else
         {
             // dodelat neighbours
-            log.info("Login sucessful.");
+            log.info("Login successful.");
         }
+    }
+
+    @Override
+    public NodeAddress getNodeAddress() {
+        return address;
+    }
+
+    @Override
+    public Neighbours getNeighbours() {
+        return neighbours;
     }
 }
