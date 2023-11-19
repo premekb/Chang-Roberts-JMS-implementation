@@ -2,8 +2,10 @@ package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.Neighbours;
 import ctu.fee.dsv.sem.Node;
-import ctu.fee.dsv.sem.NodeImpl;
 import ctu.fee.dsv.sem.communication.messages.*;
+import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.logging.Logger;
@@ -46,12 +48,18 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processGetSharedVariable(GetSharedVariableMessage getSharedVariableMessage) {
-        throw new NotImplementedException();
+        StringSharedVariable sharedVariable = node.getSharedVariable();
+        GetSharedVariableMessageResponse message = new GetSharedVariableMessageResponse(sharedVariable.getData());
+
+        messageSender.sendMessageToAddress(message, getSharedVariableMessage.senderNodeAddress);
+        log.info("Send shared variable data to node: " + getSharedVariableMessage.senderNodeAddress + "\n" +
+                "Data: " + sharedVariable.getData());
     }
 
     @Override
     public void processGetSharedVariableResponse(GetSharedVariableMessageResponse getSharedVariableMessageResponse) {
-        throw new NotImplementedException();
+        log.info("RECEIVED SHARED VARIABLE FROM LEADER: " + getSharedVariableMessageResponse.data);
+        ((RemoteStringSharedVariable) node.getSharedVariable()).setCachedResultFromResponse(getSharedVariableMessageResponse.data);
     }
 
     @Override

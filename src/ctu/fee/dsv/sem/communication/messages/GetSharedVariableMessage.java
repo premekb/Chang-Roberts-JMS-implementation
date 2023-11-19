@@ -1,10 +1,13 @@
 package ctu.fee.dsv.sem.communication.messages;
 
+import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 
 public class GetSharedVariableMessage extends Message {
-    public GetSharedVariableMessage() {
-        super(GetSharedVariableMessage.class.getName());
+    public final NodeAddress senderNodeAddress;
+
+    public GetSharedVariableMessage(NodeAddress senderNodeAddress) {
+        this.senderNodeAddress = senderNodeAddress;
     }
 
     @Override

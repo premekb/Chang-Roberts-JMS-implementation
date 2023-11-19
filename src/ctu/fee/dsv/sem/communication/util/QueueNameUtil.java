@@ -11,7 +11,6 @@ public class QueueNameUtil {
                 ".Receiver." + receiver.getNodeName();
     }
 
-    @Deprecated
     public static String getQueueName(NodeAddress receiver)
     {
         return "Receiver." + receiver.getNodeName();

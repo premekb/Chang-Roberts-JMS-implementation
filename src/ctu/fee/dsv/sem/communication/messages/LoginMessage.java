@@ -7,7 +7,6 @@ public class LoginMessage extends Message {
     public final NodeAddress senderNodeAddress;
 
     public LoginMessage(NodeAddress senderNodeAddress) {
-        super(LoginMessage.class.getName());
         this.senderNodeAddress = senderNodeAddress;
     }
 

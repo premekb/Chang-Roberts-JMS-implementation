@@ -2,10 +2,14 @@ package ctu.fee.dsv.sem;
 
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.facade.*;
+import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
+import ctu.fee.dsv.sem.communication.wrapper.MessageConsumer;
 import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
 import ctu.fee.dsv.sem.communication.messages.LoginMessage;
 import ctu.fee.dsv.sem.communication.messages.Message;
-import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.jms.Session;
@@ -14,7 +18,7 @@ import java.util.logging.Logger;
 public class NodeImpl implements Node, Runnable {
 
     private static final Logger log = Logger.getLogger(NodeImpl.class.toString());
-    private SharedVariable<String> sharedVariable; // Tohle by mohla byt proxy classa a jestli bude node leader tak bude jina implementace nez kdyz neni leader
+    private StringSharedVariable sharedVariable; // Tohle by mohla byt proxy classa a jestli bude node leader tak bude jina implementace nez kdyz neni leader
 
     private Neighbours neighbours;
 
@@ -38,6 +42,7 @@ public class NodeImpl implements Node, Runnable {
         this.messageSender = new MessageSenderImpl(session, address, neighbours);
         this.messageReceiver = new MessageReceiverImpl(this, session);
         this.messageProcessor = new MessageProcessorImpl(this, messageSender);
+        this.sharedVariable = new LocalStringSharedVariable();
     }
 
 
@@ -57,13 +62,13 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public SharedVariable getSharedVariable() {
+    public StringSharedVariable getSharedVariable() {
         return sharedVariable;
     }
 
     @Override
-    public void setSharedVariable(SharedVariable sharedVariable) {
-        this.sharedVariable = sharedVariable;
+    public void setSharedVariable(String data) {
+        this.sharedVariable.setData(data);
     }
 
     @Override
@@ -82,9 +87,9 @@ public class NodeImpl implements Node, Runnable {
      */
     private void login() {
         log.info("Trying to login to node: " + initialNodeAddress.toString());
+        MessageConsumerImpl consumer = new MessageConsumerImpl(session, address, true);
         messageSender.sendMessageToAddress(new LoginMessage(address), initialNodeAddress);
 
-        MessageConsumerImpl consumer = new MessageConsumerImpl(session, initialNodeAddress, address);
         Message response = consumer.tryGetMessage(2000);
 
         if (response == null)
@@ -94,9 +99,11 @@ public class NodeImpl implements Node, Runnable {
 
         else
         {
+            sharedVariable = new RemoteStringSharedVariable(messageSender);
             processMessage(response);
             log.info("Login successful.");
         }
+        consumer.close();
     }
 
     @Override
@@ -117,5 +124,7 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void setNeighbours(Neighbours neighbours) {
         this.neighbours = neighbours;
+        this.messageReceiver.startListeningToMessages();
+        this.messageSender.setNewReceivers(neighbours.next, neighbours.nnext, neighbours.prev, neighbours.leader);
     }
 }

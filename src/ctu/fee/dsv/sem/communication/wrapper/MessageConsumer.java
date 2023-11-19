@@ -17,4 +17,6 @@ public interface MessageConsumer {
     Message tryGetMessage(long millisecondsToWait);
 
     void setMessageListener(MessageListener messageListener);
+
+    void close();
 }

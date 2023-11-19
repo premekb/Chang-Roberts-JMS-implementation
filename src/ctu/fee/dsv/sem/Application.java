@@ -1,6 +1,7 @@
 package ctu.fee.dsv.sem;
 
 import com.sun.messaging.ConnectionFactory;
+import ctu.fee.dsv.sem.cmdline.ConsoleHandler;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 
 import javax.jms.*;
@@ -17,6 +18,8 @@ public class Application {
         Session session = connection.createSession();
 
         Node node = new NodeImpl(nodeCfg, session);
+        ConsoleHandler consoleHandler = new ConsoleHandler(node);
+        new Thread(consoleHandler).start();
         node.run();
 
         connection.close();

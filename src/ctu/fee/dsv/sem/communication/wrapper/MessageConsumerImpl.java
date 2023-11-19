@@ -13,11 +13,15 @@ public class MessageConsumerImpl implements MessageConsumer {
     private final String queueName;
 
     private static final Logger log = Logger.getLogger(MessageConsumerImpl.class.toString());
-    public MessageConsumerImpl(Session session, NodeAddress senderAddress, NodeAddress receiverAddress) {
+    public MessageConsumerImpl(Session session, NodeAddress receiverAddress, boolean purgeQueue) {
         try {
             queueName = QueueNameUtil.getQueueName(receiverAddress);
             Queue queue = new com.sun.messaging.Queue(queueName);
             jmsConsumer = session.createConsumer(queue);
+            if (purgeQueue)
+            {
+                purgeQueue();
+            }
         } catch (JMSException e) {
             throw new RuntimeException(e);
         }
@@ -49,6 +53,24 @@ public class MessageConsumerImpl implements MessageConsumer {
         try {
             jmsConsumer.setMessageListener(messageListener);
         } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void purgeQueue() throws JMSException {
+        log.info("PURGING QUEUE: " + queueName);
+        while (jmsConsumer.receive(100) != null)
+        {
+
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            jmsConsumer.close();
+        } catch (JMSException e) {
+            log.severe("Failed to close consumer.");
             throw new RuntimeException(e);
         }
     }

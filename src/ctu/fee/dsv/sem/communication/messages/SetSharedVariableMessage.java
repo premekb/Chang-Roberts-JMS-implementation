@@ -6,7 +6,6 @@ public class SetSharedVariableMessage<T> extends Message {
     private final T data;
 
     public SetSharedVariableMessage(T data) {
-        super(SetSharedVariableMessage.class.getName());
         this.data = data;
     }
 

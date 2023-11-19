@@ -2,7 +2,7 @@ package ctu.fee.dsv.sem.sharedvariable;
 
 import java.io.Serializable;
 
-public class LocalStringSharedVariable implements Serializable, SharedVariable<String> {
+public class LocalStringSharedVariable implements Serializable, StringSharedVariable {
     private String data;
 
     public LocalStringSharedVariable() {

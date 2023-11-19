@@ -6,7 +6,6 @@ import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 public class LoginMessageResponse extends Message {
     public final Neighbours neighbours;
     public LoginMessageResponse(Neighbours neighbours) {
-        super(LoginMessageResponse.class.getName());
         this.neighbours = neighbours;
     }
 

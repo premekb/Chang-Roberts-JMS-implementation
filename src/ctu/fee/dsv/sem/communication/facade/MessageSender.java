@@ -13,4 +13,8 @@ public interface MessageSender {
     void sendMessageToLeader(Message message);
 
     void sendMessageToAddress(Message message, NodeAddress destinationAddress);
+
+    void setNewReceivers(NodeAddress next, NodeAddress nnext, NodeAddress prev, NodeAddress leader);
+
+    NodeAddress getSenderAddress();
 }

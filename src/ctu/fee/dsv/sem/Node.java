@@ -1,12 +1,12 @@
 package ctu.fee.dsv.sem;
 
 import ctu.fee.dsv.sem.communication.messages.Message;
-import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
+import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 
 public interface Node extends Runnable {
-    SharedVariable getSharedVariable();
+    StringSharedVariable getSharedVariable();
 
-    void setSharedVariable(SharedVariable data);
+    void setSharedVariable(String data);
 
     void terminateWithLogout();
 
