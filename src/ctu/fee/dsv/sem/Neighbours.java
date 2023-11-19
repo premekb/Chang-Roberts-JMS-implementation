@@ -25,4 +25,12 @@ public class Neighbours implements Serializable {
         this.nnext = nnext;
         this.prev = prev;
     }
+
+    @Override
+    public String toString() {
+        return  "leader=" + leader +
+                ", next=" + next +
+                ", nnext=" + nnext +
+                ", prev=" + prev;
+    }
 }

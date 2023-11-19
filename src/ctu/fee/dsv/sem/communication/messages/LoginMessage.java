@@ -1,6 +1,7 @@
 package ctu.fee.dsv.sem.communication.messages;
 
 import ctu.fee.dsv.sem.NodeAddress;
+import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 
 public class LoginMessage extends Message {
     public final NodeAddress senderNodeAddress;
@@ -8,5 +9,10 @@ public class LoginMessage extends Message {
     public LoginMessage(NodeAddress senderNodeAddress) {
         super(LoginMessage.class.getName());
         this.senderNodeAddress = senderNodeAddress;
+    }
+
+    @Override
+    public void process(MessageProcessor messageProcessor) {
+        messageProcessor.processLoginMessage(this);
     }
 }

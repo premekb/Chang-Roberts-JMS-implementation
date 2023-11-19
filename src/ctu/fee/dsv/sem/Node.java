@@ -1,5 +1,6 @@
 package ctu.fee.dsv.sem;
 
+import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.sharedvariable.SharedVariable;
 
 public interface Node extends Runnable {
@@ -14,4 +15,8 @@ public interface Node extends Runnable {
     NodeAddress getNodeAddress();
 
     Neighbours getNeighbours();
+
+    void processMessage(Message message);
+
+    void setNeighbours(Neighbours neighbours);
 }

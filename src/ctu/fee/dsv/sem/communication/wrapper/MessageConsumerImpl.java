@@ -10,10 +10,12 @@ import java.util.logging.Logger;
 public class MessageConsumerImpl implements MessageConsumer {
     private final javax.jms.MessageConsumer jmsConsumer;
 
+    private final String queueName;
+
     private static final Logger log = Logger.getLogger(MessageConsumerImpl.class.toString());
     public MessageConsumerImpl(Session session, NodeAddress senderAddress, NodeAddress receiverAddress) {
         try {
-            String queueName = QueueNameUtil.getQueueName(senderAddress, receiverAddress);
+            queueName = QueueNameUtil.getQueueName(receiverAddress);
             Queue queue = new com.sun.messaging.Queue(queueName);
             jmsConsumer = session.createConsumer(queue);
         } catch (JMSException e) {

@@ -12,11 +12,13 @@ public class MessageProducerImpl implements MessageProducer{
 
     private static final Logger log = Logger.getLogger(MessageProducerImpl.class.toString());
 
+    private final String queueName;
+
     private final Session jmsSession;
     public MessageProducerImpl(Session session, NodeAddress senderAddress, NodeAddress receiverAddress) {
         try {
             jmsSession = session;
-            String queueName = QueueNameUtil.getQueueName(senderAddress, receiverAddress);
+            queueName = QueueNameUtil.getQueueName(receiverAddress);
             Queue queue = new com.sun.messaging.Queue(queueName);
             jmsProducer = session.createProducer(queue);
         } catch (JMSException e) {
@@ -31,7 +33,8 @@ public class MessageProducerImpl implements MessageProducer{
             objectMessage.setObject(message);
 
             jmsProducer.send(objectMessage);
-            log.info("Sent a message: " + message.toString());
+            log.info("Sent a message: " + message.toString() + "\n" +
+                    "To queue: " + queueName);
         } catch (JMSException e) {
             log.severe("Failed to send message: " + e.getMessage());
             throw new RuntimeException(e);

@@ -1,5 +1,7 @@
 package ctu.fee.dsv.sem.communication.messages;
 
+import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
+
 public class SetSharedVariableMessage<T> extends Message {
     private final T data;
 
@@ -10,5 +12,10 @@ public class SetSharedVariableMessage<T> extends Message {
 
     public T getData() {
         return data;
+    }
+
+    @Override
+    public void process(MessageProcessor messageProcessor) {
+        messageProcessor.processSetSharedVariable(this);
     }
 }
