@@ -10,12 +10,12 @@ public class LocalStringSharedVariable implements Serializable, StringSharedVari
     }
 
     @Override
-    public String getData() {
+    public synchronized String getData() {
         return data;
     }
 
     @Override
-    public void setData(String data) {
+    public synchronized void setData(String data) {
         this.data = data;
     }
 }

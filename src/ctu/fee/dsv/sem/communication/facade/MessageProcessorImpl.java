@@ -2,12 +2,16 @@ package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.Neighbours;
 import ctu.fee.dsv.sem.Node;
+import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.communication.messages.*;
-import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.xml.ws.soap.Addressing;
 import java.util.logging.Logger;
 
 public class MessageProcessorImpl implements MessageProcessor {
@@ -22,20 +26,71 @@ public class MessageProcessorImpl implements MessageProcessor {
         this.messageSender = messageSender;
     }
 
+
+    // TODO VYMEN TO MOZNA ZA IFY PRO KONKRETNI SCENARE
+    // TODO TZN. KDYZ JSOU 2 NODES tak nastav adresy, kdyz 3 tak nejak, jestli 4 tak potom normal...
     @Override
     public void processLoginMessage(LoginMessage loginMessage) {
-        // TODO Change neighbours of other nodes
-        Neighbours currentNodeNeighbours = node.getNeighbours();
+        Neighbours myNewNeighbours;
+        NodeAddress currentInitialNext = node.getNeighbours().next;
+        NodeAddress currentInitialPrev = node.getNeighbours().prev;
 
-        Neighbours newNeighbours = new Neighbours(
-                currentNodeNeighbours.leader,
-                currentNodeNeighbours.next,
-                currentNodeNeighbours.nnext,
-                currentNodeNeighbours.prev
-        ); // TODO jinak
+        Neighbours newNeighbours = new Neighbours( // neighbours toho joinujiciho nodu
+                node.getNeighbours().leader,
+                node.getNeighbours().next,
+                node.getNeighbours().nnext,
+                node.getNodeAddress()
+        );
         LoginMessageResponse loginMessageResponse =  new LoginMessageResponse(newNeighbours);
-
         messageSender.sendMessageToAddress(loginMessageResponse, loginMessage.senderNodeAddress);
+
+
+        if (node.getNeighbours().next.equals(node.getNodeAddress()))
+        {
+            myNewNeighbours = new Neighbours(
+                    node.getNeighbours().leader,
+                    node.getNeighbours().next,
+                    node.getNeighbours().nnext,
+                    loginMessage.senderNodeAddress
+            );
+            node.setNeighbours(myNewNeighbours);
+        }
+
+        // nextovi poslu jako prev toho kdo se joinul
+        else
+        {
+            NewPrevMessage newPrevMessage = new NewPrevMessage(loginMessage.senderNodeAddress);
+            messageSender.sendMessageToNext(newPrevMessage);
+        }
+
+
+        // prevovi poslu jako nnext toho kde se joinul
+        if (currentInitialPrev.equals(node.getNodeAddress()))
+        {
+            myNewNeighbours = new Neighbours(
+                    node.getNeighbours().leader,
+                    node.getNeighbours().next,
+                    loginMessage.senderNodeAddress,
+                    node.getNeighbours().prev
+            );
+            node.setNeighbours(myNewNeighbours);
+        }
+
+        else
+        {
+            NewNextNextMessage newNextNextMessage = new NewNextNextMessage(loginMessage.senderNodeAddress);
+            messageSender.sendMessageToPrev(newNextNextMessage);
+        }
+        messageSender.sendMessageToAddress(new NewNextNextMessage(node.getNeighbours().nnext), loginMessage.senderNodeAddress);
+
+        myNewNeighbours = new Neighbours(
+                node.getNeighbours().leader,
+                loginMessage.senderNodeAddress,
+                currentInitialNext,
+                node.getNeighbours().prev
+                );
+        node.setNeighbours(myNewNeighbours);
+
         log.info("Responded to login message from: " + loginMessage.senderNodeAddress + "\n" +
                 "With neighbours: " + newNeighbours);
     }
@@ -65,5 +120,41 @@ public class MessageProcessorImpl implements MessageProcessor {
     @Override
     public void processSetSharedVariable(SetSharedVariableMessage setSharedVariableMessage) {
         throw new NotImplementedException();
+    }
+
+    @Override
+    public void processNewPrev(NewPrevMessage newPrevMessage) {
+        Neighbours currentNeighbours = node.getNeighbours();
+        node.setNeighbours(
+                new Neighbours(
+                        currentNeighbours.leader,
+                        currentNeighbours.next,
+                        currentNeighbours.nnext,
+                        newPrevMessage.newPrev
+                ));
+    }
+
+    @Override
+    public void processNewNext(NewNextMessage newNextMessage) {
+        Neighbours currentNeighbours = node.getNeighbours();
+        node.setNeighbours(
+                new Neighbours(
+                        currentNeighbours.leader,
+                        newNextMessage.newNext,
+                        currentNeighbours.nnext,
+                        currentNeighbours.prev
+                ));
+    }
+
+    @Override
+    public void processNewNextNext(NewNextNextMessage newNextNextMessage) {
+        Neighbours currentNeighbours = node.getNeighbours();
+        node.setNeighbours(
+                new Neighbours(
+                        currentNeighbours.leader,
+                        currentNeighbours.next,
+                        newNextNextMessage.newNextNext,
+                        currentNeighbours.prev
+                ));
     }
 }

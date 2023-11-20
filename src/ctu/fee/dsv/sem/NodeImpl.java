@@ -72,13 +72,13 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public void terminateWithLogout() {
+    public void logout() {
         throw new NotImplementedException();
     }
 
     @Override
     public void terminateWithoutLogout() {
-        throw new NotImplementedException();
+        System.exit(1);
     }
 
     /**
@@ -126,5 +126,12 @@ public class NodeImpl implements Node, Runnable {
         this.neighbours = neighbours;
         this.messageReceiver.startListeningToMessages();
         this.messageSender.setNewReceivers(neighbours.next, neighbours.nnext, neighbours.prev, neighbours.leader);
+    }
+
+    @Override
+    public String toString() {
+        return "NODE STATUS\n"
+                + address + "\n"
+                + neighbours;
     }
 }

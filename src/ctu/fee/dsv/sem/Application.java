@@ -12,7 +12,7 @@ public class Application {
     private static final String IMQ_BROKER_HOST_NAME_KEY = "imqBrokerHostName";
 
     private static final String IMQ_CONNECTION_URL_KEY = "imqConnectionURL";
-    public static void main(String[] args) throws JMSException, NamingException, InterruptedException {
+    public static void main(String[] args) throws JMSException {
         NodeConfiguration nodeCfg = initNodeCfg(args);
         Connection connection = initJmsConnection();
         Session session = connection.createSession();

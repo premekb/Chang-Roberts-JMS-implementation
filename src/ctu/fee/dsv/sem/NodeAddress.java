@@ -1,6 +1,7 @@
 package ctu.fee.dsv.sem;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class NodeAddress implements Serializable {
 
@@ -24,6 +25,17 @@ public class NodeAddress implements Serializable {
 
     @Override
     public String toString() {
-        return "Node: " + nodeName + " " + nodeId;
+        return nodeName + " " + nodeId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeAddress that = (NodeAddress) o;
+
+        if (!Objects.equals(nodeId, that.nodeId)) return false;
+        return Objects.equals(nodeName, that.nodeName);
     }
 }

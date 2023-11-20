@@ -8,7 +8,7 @@ public interface Node extends Runnable {
 
     void setSharedVariable(String data);
 
-    void terminateWithLogout();
+    void logout();
 
     void terminateWithoutLogout();
 

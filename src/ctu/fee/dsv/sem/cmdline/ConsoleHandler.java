@@ -32,7 +32,8 @@ public class ConsoleHandler implements Runnable {
             System.out.print("? - this help");
             System.out.print("get - get the content of the shared variable");
             System.out.print("set {content} - set the content of the shared variable");
-            System.out.print("s - print node status");
+            System.out.print("status - print node status");
+            System.out.print("terminate - exits without logout");
         } else if (commandline.equals("get")) {
             System.out.println("Shared variable content: " + node.getSharedVariable().getData());
         }
@@ -40,6 +41,15 @@ public class ConsoleHandler implements Runnable {
             {
                 node.setSharedVariable(splitCmdline[1]);
             }
+        else if (commandline.equals("status"))
+        {
+            System.out.println(node.toString());
+        }
+        else if (commandline.equals("terminate"))
+        {
+            node.terminateWithoutLogout();
+            System.exit(1);
+        }
          else {
             // do nothing
             System.out.print("Unrecognized command.");
