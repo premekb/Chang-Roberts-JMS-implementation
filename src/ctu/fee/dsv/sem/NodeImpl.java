@@ -61,6 +61,7 @@ public class NodeImpl implements Node, Runnable {
         }
     }
 
+    // TODO checki asi jestli jsem leader nebo ne, kdyztak zkontrolovat, ze tam je remote
     @Override
     public StringSharedVariable getSharedVariable() {
         return sharedVariable;

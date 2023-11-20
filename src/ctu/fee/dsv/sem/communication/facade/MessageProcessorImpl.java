@@ -119,7 +119,7 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processSetSharedVariable(SetSharedVariableMessage setSharedVariableMessage) {
-        throw new NotImplementedException();
+        node.setSharedVariable(setSharedVariableMessage.getData());
     }
 
     @Override

@@ -40,7 +40,7 @@ public class RemoteStringSharedVariable implements Serializable, StringSharedVar
 
     @Override
     public void setData(String data) {
-        messageSender.sendMessageToLeader(new SetSharedVariableMessage<>(data));
+        messageSender.sendMessageToLeader(new SetSharedVariableMessage(data));
     }
 
     public void setCachedResultFromResponse(String data)

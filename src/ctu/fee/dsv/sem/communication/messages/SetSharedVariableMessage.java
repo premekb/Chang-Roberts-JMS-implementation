@@ -2,14 +2,14 @@ package ctu.fee.dsv.sem.communication.messages;
 
 import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 
-public class SetSharedVariableMessage<T> extends Message {
-    private final T data;
+public class SetSharedVariableMessage extends Message {
+    private final String data;
 
-    public SetSharedVariableMessage(T data) {
+    public SetSharedVariableMessage(String data) {
         this.data = data;
     }
 
-    public T getData() {
+    public String getData() {
         return data;
     }
 
