@@ -1,6 +1,8 @@
 package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.communication.messages.*;
+import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
+import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
@@ -23,4 +25,8 @@ public interface MessageProcessor {
     void processNewNextNext(NewNextNextMessage newNextNextMessage);
 
     void processLogoutInfoPrevMessage(LogoutInfoPrevMessage logoutInfoPrevMessage);
+
+    void processElectMessage(ElectMessage electMessage);
+
+    void processElectedMessage(ElectedMessage electedMessage);
 }

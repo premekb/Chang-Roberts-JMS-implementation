@@ -1,6 +1,7 @@
 package ctu.fee.dsv.sem.cmdline;
 
 import ctu.fee.dsv.sem.Node;
+import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class ConsoleHandler implements Runnable {
             System.out.print("? - this help");
             System.out.print("get - get the content of the shared variable");
             System.out.print("set {content} - set the content of the shared variable");
+            System.out.print("election - start a new election");
             System.out.print("status - print node status");
             System.out.print("logout - exit with informing other nodes");
             System.out.print("terminate - exits without logout");
@@ -42,6 +44,10 @@ public class ConsoleHandler implements Runnable {
             {
                 node.setSharedVariable(splitCmdline[1]);
             }
+        else if (commandline.equals("election"))
+        {
+            node.processMessage(new ElectMessage(node.getNeighbours().prev));
+        }
         else if (commandline.equals("status"))
         {
             System.out.println(node.toString());

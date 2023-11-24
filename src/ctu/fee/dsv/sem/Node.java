@@ -19,4 +19,10 @@ public interface Node extends Runnable {
     void processMessage(Message message);
 
     void setNeighbours(Neighbours neighbours);
+
+    void setVoting(boolean isVoting);
+
+    boolean isVoting();
+
+    void setLeader(NodeAddress address);
 }

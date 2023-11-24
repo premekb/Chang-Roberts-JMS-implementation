@@ -34,6 +34,8 @@ public class NodeImpl implements Node, Runnable {
 
     private final Session session;
 
+    private boolean voting = false;
+
     public NodeImpl(NodeConfiguration cfg, Session session) {
         this.session = session;
         address = new NodeAddress(cfg.getNodeName(), cfg.getId());
@@ -140,5 +142,25 @@ public class NodeImpl implements Node, Runnable {
         return "NODE STATUS\n"
                 + address + "\n"
                 + neighbours;
+    }
+
+    @Override
+    public boolean isVoting() {
+        return voting;
+    }
+
+    @Override
+    public void setVoting(boolean voting) {
+        this.voting = voting;
+    }
+
+    @Override
+    public void setLeader(NodeAddress address) {
+        setNeighbours(new Neighbours(
+                address,
+                neighbours.next,
+                neighbours.nnext,
+                neighbours.prev
+        ));
     }
 }

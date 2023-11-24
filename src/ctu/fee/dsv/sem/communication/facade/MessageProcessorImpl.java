@@ -4,15 +4,15 @@ import ctu.fee.dsv.sem.Neighbours;
 import ctu.fee.dsv.sem.Node;
 import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.communication.messages.*;
+import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
+import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
-import ctu.fee.dsv.sem.communication.util.NeighboursEdgeCaseUtil;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import javax.xml.ws.soap.Addressing;
 import java.util.logging.Logger;
 
 public class MessageProcessorImpl implements MessageProcessor {
@@ -178,5 +178,36 @@ public class MessageProcessorImpl implements MessageProcessor {
         {
 
         }*/
+    }
+
+    @Override
+    public void processElectMessage(ElectMessage electMessage) {
+        if (node.getNodeAddress().getNodeId() < electMessage.address.getNodeId())
+        {
+            messageSender.sendMessageToNext(electMessage);
+        }
+
+        if (!node.isVoting() && node.getNodeAddress().getNodeId() > electMessage.address.getNodeId())
+        {
+            messageSender.sendMessageToNext(new ElectMessage(node.getNodeAddress()));
+        }
+
+        if (node.getNodeAddress().getNodeId().equals(electMessage.address.getNodeId()))
+        {
+            ElectedMessage electedMessage = new ElectedMessage(node.getNodeAddress());
+            messageSender.sendMessageToNext(electedMessage);
+        }
+    }
+
+    @Override
+    public void processElectedMessage(ElectedMessage electedMessage) {
+        node.setLeader(electedMessage.leaderAddress);
+        log.info("Setting new leader to: " + electedMessage.leaderAddress);
+
+        if (!electedMessage.leaderAddress.equals(node.getNodeAddress()))
+        {
+            log.info("Forwarding elected message to the next node.");
+            messageSender.sendMessageToNext(electedMessage);
+        }
     }
 }
