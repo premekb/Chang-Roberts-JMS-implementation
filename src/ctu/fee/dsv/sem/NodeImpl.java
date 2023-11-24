@@ -74,11 +74,17 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void logout() {
+        log.info("Logging out.");
+        // Nexte, zmen si prev na meho prev
+        // Preve, prevezmi moje neighbours.
+        // Preve, predej svoje neighbours svojemu prevovi.
+
         throw new NotImplementedException();
     }
 
     @Override
     public void terminateWithoutLogout() {
+        log.warning("TERMINATING WITHOUT LETTING OTHER NODES KNOW.");
         System.exit(1);
     }
 

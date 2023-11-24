@@ -7,6 +7,7 @@ import ctu.fee.dsv.sem.communication.messages.*;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
+import ctu.fee.dsv.sem.communication.util.NeighboursEdgeCaseUtil;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -156,5 +157,26 @@ public class MessageProcessorImpl implements MessageProcessor {
                         newNextNextMessage.newNextNext,
                         currentNeighbours.prev
                 ));
+    }
+
+    @Override
+    public void processLogoutInfoPrevMessage(LogoutInfoPrevMessage logoutInfoPrevMessage) {
+        throw new NotImplementedException();
+        /*Neighbours newNeighbours;
+        if (NeighboursEdgeCaseUtil.isTwoNodesConfig(node.getNeighbours()))
+        {
+            newNeighbours = new Neighbours(
+                    node.getNodeAddress(),
+                    node.getNodeAddress(),
+                    node.getNodeAddress(),
+                    node.getNodeAddress()
+            );
+            node.setNeighbours(newNeighbours);
+        }
+
+        if (NeighboursEdgeCaseUtil.isThreeNodesConfig(node.getNeighbours()))
+        {
+
+        }*/
     }
 }

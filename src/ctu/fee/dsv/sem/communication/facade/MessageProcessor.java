@@ -21,4 +21,6 @@ public interface MessageProcessor {
     void processNewNext(NewNextMessage newNextMessage);
 
     void processNewNextNext(NewNextNextMessage newNextNextMessage);
+
+    void processLogoutInfoPrevMessage(LogoutInfoPrevMessage logoutInfoPrevMessage);
 }
