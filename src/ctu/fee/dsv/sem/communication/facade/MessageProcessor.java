@@ -6,6 +6,7 @@ import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
 
 public interface MessageProcessor {
     void processLoginMessage(LoginMessage loginMessage);
@@ -29,4 +30,10 @@ public interface MessageProcessor {
     void processElectMessage(ElectMessage electMessage);
 
     void processElectedMessage(ElectedMessage electedMessage);
+
+    void processHeartbeatMessage(HeartbeatMessage heartbeatMessage);
+
+    void processHeartbeatMessageResponse(HeartbeatMessageResponse heartbeatMessageResponse);
+
+    void processRepairMyNextNextMessage(RepairMyNextNextMessage repairMyNextNextMessage);
 }

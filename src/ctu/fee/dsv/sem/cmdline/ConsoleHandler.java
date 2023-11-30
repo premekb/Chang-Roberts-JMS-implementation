@@ -30,13 +30,13 @@ public class ConsoleHandler implements Runnable {
     private void parse_commandline(String commandline) {
         String[] splitCmdline = commandline.split(" ");
         if (commandline.equals("?")) {
-            System.out.print("? - this help");
-            System.out.print("get - get the content of the shared variable");
-            System.out.print("set {content} - set the content of the shared variable");
-            System.out.print("election - start a new election");
-            System.out.print("status - print node status");
-            System.out.print("logout - exit with informing other nodes");
-            System.out.print("terminate - exits without logout");
+            System.out.println("? - this help");
+            System.out.println("get - get the content of the shared variable");
+            System.out.println("set {content} - set the content of the shared variable");
+            System.out.println("election - start a new election");
+            System.out.println("status - print node status");
+            System.out.println("logout - exit with informing other nodes");
+            System.out.println("terminate - exits without logout");
         } else if (commandline.equals("get")) {
             System.out.println("Shared variable content: " + node.getSharedVariable().getData());
         }
@@ -46,7 +46,7 @@ public class ConsoleHandler implements Runnable {
             }
         else if (commandline.equals("election"))
         {
-            node.processMessage(new ElectMessage(node.getNeighbours().prev));
+            node.startElection();
         }
         else if (commandline.equals("status"))
         {

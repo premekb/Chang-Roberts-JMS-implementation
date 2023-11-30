@@ -1,0 +1,2 @@
+- Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel?
+- 

@@ -5,15 +5,23 @@ import ctu.fee.dsv.sem.cmdline.ConsoleHandler;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 
 import javax.jms.*;
-import javax.naming.NamingException;
+import java.io.IOException;
+import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Application {
 
     private static final String IMQ_BROKER_HOST_NAME_KEY = "imqBrokerHostName";
 
     private static final String IMQ_CONNECTION_URL_KEY = "imqConnectionURL";
-    public static void main(String[] args) throws JMSException {
+
+    private static final Logger ROOT_LOGGER = Logger.getLogger("");
+    public static void main(String[] args) throws JMSException, IOException {
         NodeConfiguration nodeCfg = initNodeCfg(args);
+        configureLogger(nodeCfg);
         Connection connection = initJmsConnection();
         Session session = connection.createSession();
 
@@ -53,5 +61,29 @@ public class Application {
         }
 
         return nodeCfg;
+    }
+
+    private static void configureLogger(NodeConfiguration nodeConfiguration) throws IOException {
+        FileHandler fileHandler = new FileHandler(nodeConfiguration.getNodeName() + ".txt");
+
+        // Add file handler as
+        // handler of logs
+        ROOT_LOGGER.addHandler(fileHandler);
+
+        ROOT_LOGGER.removeHandler(ROOT_LOGGER.getHandlers()[0]);
+        java.util.logging.ConsoleHandler consoleHandler = new java.util.logging.ConsoleHandler();
+        consoleHandler.setFormatter(new SimpleFormatter() {
+            private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
+
+            @Override
+            public synchronized String format(LogRecord lr) {
+                return String.format(format,
+                        new Date(lr.getMillis()),
+                        lr.getLevel().getLocalizedName(),
+                        lr.getMessage()
+                );
+            }
+        });
+        ROOT_LOGGER.addHandler(consoleHandler);
     }
 }

@@ -9,6 +9,7 @@ import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -20,11 +21,14 @@ public class MessageProcessorImpl implements MessageProcessor {
     private final Node node;
     private final MessageSender messageSender;
 
+    private final HeartbeatService heartbeatService;
+
     private static final Logger log = Logger.getLogger(MessageProcessorImpl.class.toString());
 
-    public MessageProcessorImpl(Node node, MessageSender messageSender) {
+    public MessageProcessorImpl(Node node, MessageSender messageSender, HeartbeatService heartbeatService) {
         this.node = node;
         this.messageSender = messageSender;
+        this.heartbeatService = heartbeatService;
     }
 
 
@@ -209,5 +213,27 @@ public class MessageProcessorImpl implements MessageProcessor {
             log.info("Forwarding elected message to the next node.");
             messageSender.sendMessageToNext(electedMessage);
         }
+    }
+
+    @Override
+    public void processHeartbeatMessage(HeartbeatMessage heartbeatMessage) {
+        log.info("Received heartbeat from: " + heartbeatMessage.SenderNodeAddress);
+        log.info("Responding to heartbeat");
+
+        messageSender.sendMessageToAddress(new HeartbeatMessageResponse(node.getNodeAddress()), heartbeatMessage.SenderNodeAddress);
+    }
+
+    @Override
+    public void processHeartbeatMessageResponse(HeartbeatMessageResponse heartbeatMessageResponse) {
+        log.info("Received heartbeat from: " + heartbeatMessageResponse.senderNodeAddress);
+
+        heartbeatService.heartbeatReceived();
+    }
+
+    @Override
+    public void processRepairMyNextNextMessage(RepairMyNextNextMessage repairMyNextNextMessage) {
+        log.info("REPAIR: Sending new next next to new prev.");
+
+        messageSender.sendMessageToAddress(new NewNextNextMessage(node.getNeighbours().next), repairMyNextNextMessage.senderNodeAddress);
     }
 }

@@ -25,4 +25,8 @@ public interface Node extends Runnable {
     boolean isVoting();
 
     void setLeader(NodeAddress address);
+
+    void repairNextNodeMissing();
+
+    void startElection();
 }

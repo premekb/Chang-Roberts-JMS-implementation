@@ -3,6 +3,11 @@ package ctu.fee.dsv.sem;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.facade.*;
 import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
+import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
+import ctu.fee.dsv.sem.communication.util.NeighboursEdgeCaseUtil;
 import ctu.fee.dsv.sem.communication.wrapper.MessageConsumer;
 import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
 import ctu.fee.dsv.sem.communication.messages.LoginMessage;
@@ -32,6 +37,8 @@ public class NodeImpl implements Node, Runnable {
 
     private final MessageProcessor messageProcessor;
 
+    private final HeartbeatService heartbeatService;
+
     private final Session session;
 
     private boolean voting = false;
@@ -43,7 +50,8 @@ public class NodeImpl implements Node, Runnable {
         neighbours = new Neighbours(address);
         this.messageSender = new MessageSenderImpl(session, address, neighbours);
         this.messageReceiver = new MessageReceiverImpl(this, session);
-        this.messageProcessor = new MessageProcessorImpl(this, messageSender);
+        this.heartbeatService = new HeartbeatServiceImpl(messageSender, this);
+        this.messageProcessor = new MessageProcessorImpl(this, messageSender, heartbeatService);
         this.sharedVariable = new LocalStringSharedVariable();
     }
 
@@ -53,6 +61,7 @@ public class NodeImpl implements Node, Runnable {
         // tady jsou neighbours sami na sebe
         login();
         messageReceiver.startListeningToMessages();
+        new Thread(heartbeatService).start();
         while (true)
         {
             try {
@@ -162,5 +171,54 @@ public class NodeImpl implements Node, Runnable {
                 neighbours.nnext,
                 neighbours.prev
         ));
+    }
+
+    /**
+     * TODO tady mozna potrebujes synchronni odpoved na to kdo je tvuj novy nnext
+     * TODO ted se ptas asynchronne, mozna ale budes muset prepsat system prijimani a posilani zprav do nejakeho synchronniho while cyklu
+     */
+    @Override
+    public void repairNextNodeMissing() {
+        log.severe("HEARBEAT NOT RECEIVED. REPAIRING TOPOLOGY");
+        boolean leaderMissing = neighbours.next.equals(neighbours.leader);
+        boolean isThreeNodesConfig = NeighboursEdgeCaseUtil.isThreeNodesConfig(neighbours);
+
+        // SET NEW NEXT
+        setNeighbours(new Neighbours(
+                neighbours.leader,
+                neighbours.nnext,
+                neighbours.nnext,
+                neighbours.prev
+        ));
+
+        // OD NOVEHO NEXTA DOSTAN SVUJ NOVY NNEXT
+        if (isThreeNodesConfig)
+        {
+            setNeighbours(new Neighbours(
+                    neighbours.leader,
+                    neighbours.next,
+                    address,
+                    neighbours.prev
+            ));
+        }
+        else
+        {
+            messageSender.sendMessageToNext(new RepairMyNextNextMessage(address));
+        }
+
+        // NNEXTOVI POSLI ZE JSI JEHO PREV
+        messageSender.sendMessageToNext(new NewPrevMessage(this.address)); // Tohle mozna nemusi probehnout, on to pozna z te zpravy?
+        // PREVOVI POSLI NOVY NNEXT
+        messageSender.sendMessageToPrev(new NewNextNextMessage(neighbours.next));
+        // LEADER ELECTION JESTLI UMREL LEADER
+        if (leaderMissing)
+        {
+            startElection();
+        }
+    }
+
+    @Override
+    public void startElection() {
+        processMessage(new ElectMessage(getNeighbours().prev));
     }
 }

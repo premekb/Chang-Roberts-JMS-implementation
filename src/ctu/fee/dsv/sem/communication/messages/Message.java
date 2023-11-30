@@ -10,8 +10,6 @@ public abstract class Message implements Serializable {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "messageClass='" + this.getClass() + '\'' +
-                '}';
+        return this.getClass().getSimpleName();
     }
 }
