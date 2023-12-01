@@ -2,6 +2,7 @@ package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.Node;
 import ctu.fee.dsv.sem.NodeImpl;
+import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.messages.HeartbeatMessage;
 
 import java.util.logging.Logger;
@@ -10,16 +11,19 @@ public class HeartbeatServiceImpl implements HeartbeatService {
 
     private static final Logger log = Logger.getLogger(HeartbeatServiceImpl.class.toString());
 
-    private static Integer  CHECKING_PERIOD = 5_000;
+    private static Integer  CHECKING_PERIOD = 15_000;
     private final MessageSender messageSender;
 
     private final Node node;
 
+    private final LogicalLocalClock logicalLocalClock;
+
     private boolean heartbeatResponseReceived;
 
-    public HeartbeatServiceImpl(MessageSender messageSender, Node node) {
+    public HeartbeatServiceImpl(MessageSender messageSender, Node node, LogicalLocalClock logicalLocalClock) {
         this.messageSender = messageSender;
         this.node = node;
+        this.logicalLocalClock = logicalLocalClock;
     }
 
     /**
@@ -28,8 +32,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
     @Override
     public void run() {
         try {
-            log.info("Sending heratbeat request.");
-            messageSender.sendMessageToNext(new HeartbeatMessage(node.getNodeAddress()));
+            messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
             Thread.sleep(CHECKING_PERIOD);
 
             while (true) {
@@ -39,8 +42,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
                     Thread.sleep(1000);
                 }
                 heartbeatResponseReceived = false;
-                log.info("Sending heratbeat request.");
-                messageSender.sendMessageToNext(new HeartbeatMessage(node.getNodeAddress()));
+                messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
                 Thread.sleep(CHECKING_PERIOD);
             }
         } catch (InterruptedException e) {

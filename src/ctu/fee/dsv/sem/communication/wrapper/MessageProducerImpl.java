@@ -33,9 +33,9 @@ public class MessageProducerImpl implements MessageProducer{
             objectMessage.setObject(message);
 
             jmsProducer.send(objectMessage);
-            log.info("Sent a message: " + message.toString() +  " To queue: " + queueName);
+            log.info("SENT     " + message.toString() +  " To queue: " + queueName);
         } catch (JMSException e) {
-            log.severe("Failed to send message: " + e.getMessage());
+            log.severe("FAILED   " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

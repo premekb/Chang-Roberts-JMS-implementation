@@ -3,6 +3,7 @@ package ctu.fee.dsv.sem.communication.facade;
 import ctu.fee.dsv.sem.Neighbours;
 import ctu.fee.dsv.sem.Node;
 import ctu.fee.dsv.sem.NodeAddress;
+import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.messages.*;
 import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
 import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
@@ -12,6 +13,7 @@ import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
+import ctu.fee.dsv.sem.util.LoggingUtil;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.logging.Logger;
@@ -23,12 +25,18 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     private final HeartbeatService heartbeatService;
 
+    private final LogicalLocalClock logicalLocalClock;
+
     private static final Logger log = Logger.getLogger(MessageProcessorImpl.class.toString());
 
-    public MessageProcessorImpl(Node node, MessageSender messageSender, HeartbeatService heartbeatService) {
+    public MessageProcessorImpl(Node node,
+                                MessageSender messageSender,
+                                HeartbeatService heartbeatService,
+                                LogicalLocalClock logicalLocalClock) {
         this.node = node;
         this.messageSender = messageSender;
         this.heartbeatService = heartbeatService;
+        this.logicalLocalClock = logicalLocalClock;
     }
 
 
@@ -36,6 +44,7 @@ public class MessageProcessorImpl implements MessageProcessor {
     // TODO TZN. KDYZ JSOU 2 NODES tak nastav adresy, kdyz 3 tak nejak, jestli 4 tak potom normal...
     @Override
     public void processLoginMessage(LoginMessage loginMessage) {
+        LoggingUtil.logReceivingMessage(log, loginMessage, logicalLocalClock);
         Neighbours myNewNeighbours;
         NodeAddress currentInitialNext = node.getNeighbours().next;
         NodeAddress currentInitialPrev = node.getNeighbours().prev;
@@ -46,7 +55,7 @@ public class MessageProcessorImpl implements MessageProcessor {
                 node.getNeighbours().nnext,
                 node.getNodeAddress()
         );
-        LoginMessageResponse loginMessageResponse =  new LoginMessageResponse(newNeighbours);
+        LoginMessageResponse loginMessageResponse =  new LoginMessageResponse(logicalLocalClock, newNeighbours);
         messageSender.sendMessageToAddress(loginMessageResponse, loginMessage.senderNodeAddress);
 
 
@@ -64,7 +73,7 @@ public class MessageProcessorImpl implements MessageProcessor {
         // nextovi poslu jako prev toho kdo se joinul
         else
         {
-            NewPrevMessage newPrevMessage = new NewPrevMessage(loginMessage.senderNodeAddress);
+            NewPrevMessage newPrevMessage = new NewPrevMessage(logicalLocalClock, loginMessage.senderNodeAddress);
             messageSender.sendMessageToNext(newPrevMessage);
         }
 
@@ -83,10 +92,10 @@ public class MessageProcessorImpl implements MessageProcessor {
 
         else
         {
-            NewNextNextMessage newNextNextMessage = new NewNextNextMessage(loginMessage.senderNodeAddress);
+            NewNextNextMessage newNextNextMessage = new NewNextNextMessage(logicalLocalClock, loginMessage.senderNodeAddress);
             messageSender.sendMessageToPrev(newNextNextMessage);
         }
-        messageSender.sendMessageToAddress(new NewNextNextMessage(node.getNeighbours().nnext), loginMessage.senderNodeAddress);
+        messageSender.sendMessageToAddress(new NewNextNextMessage(logicalLocalClock, node.getNeighbours().nnext), loginMessage.senderNodeAddress);
 
         myNewNeighbours = new Neighbours(
                 node.getNeighbours().leader,
@@ -102,14 +111,17 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processLoginMessageResponse(LoginMessageResponse loginMessageResponse) {
+        LoggingUtil.logReceivingMessage(log, loginMessageResponse, logicalLocalClock);
+
         node.setNeighbours(loginMessageResponse.neighbours);
-        log.info("New neighbours set from a login response: " + loginMessageResponse);
     }
 
     @Override
     public void processGetSharedVariable(GetSharedVariableMessage getSharedVariableMessage) {
+        LoggingUtil.logReceivingMessage(log, getSharedVariableMessage, logicalLocalClock);
+
         StringSharedVariable sharedVariable = node.getSharedVariable();
-        GetSharedVariableMessageResponse message = new GetSharedVariableMessageResponse(sharedVariable.getData());
+        GetSharedVariableMessageResponse message = new GetSharedVariableMessageResponse(logicalLocalClock, sharedVariable.getData());
 
         messageSender.sendMessageToAddress(message, getSharedVariableMessage.senderNodeAddress);
         log.info("Send shared variable data to node: " + getSharedVariableMessage.senderNodeAddress + "\n" +
@@ -118,17 +130,22 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processGetSharedVariableResponse(GetSharedVariableMessageResponse getSharedVariableMessageResponse) {
-        log.info("RECEIVED SHARED VARIABLE FROM LEADER: " + getSharedVariableMessageResponse.data);
+        LoggingUtil.logReceivingMessage(log, getSharedVariableMessageResponse, logicalLocalClock);
+
         ((RemoteStringSharedVariable) node.getSharedVariable()).setCachedResultFromResponse(getSharedVariableMessageResponse.data);
     }
 
     @Override
     public void processSetSharedVariable(SetSharedVariableMessage setSharedVariableMessage) {
+        LoggingUtil.logReceivingMessage(log, setSharedVariableMessage, logicalLocalClock);
+
         node.setSharedVariable(setSharedVariableMessage.getData());
     }
 
     @Override
     public void processNewPrev(NewPrevMessage newPrevMessage) {
+        LoggingUtil.logReceivingMessage(log, newPrevMessage, logicalLocalClock);
+
         Neighbours currentNeighbours = node.getNeighbours();
         node.setNeighbours(
                 new Neighbours(
@@ -141,6 +158,8 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processNewNext(NewNextMessage newNextMessage) {
+        LoggingUtil.logReceivingMessage(log, newNextMessage, logicalLocalClock);
+
         Neighbours currentNeighbours = node.getNeighbours();
         node.setNeighbours(
                 new Neighbours(
@@ -153,6 +172,8 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processNewNextNext(NewNextNextMessage newNextNextMessage) {
+        LoggingUtil.logReceivingMessage(log, newNextNextMessage, logicalLocalClock);
+
         Neighbours currentNeighbours = node.getNeighbours();
         node.setNeighbours(
                 new Neighbours(
@@ -165,6 +186,8 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processLogoutInfoPrevMessage(LogoutInfoPrevMessage logoutInfoPrevMessage) {
+        LoggingUtil.logReceivingMessage(log, logoutInfoPrevMessage, logicalLocalClock);
+
         throw new NotImplementedException();
         /*Neighbours newNeighbours;
         if (NeighboursEdgeCaseUtil.isTwoNodesConfig(node.getNeighbours()))
@@ -186,6 +209,8 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processElectMessage(ElectMessage electMessage) {
+        LoggingUtil.logReceivingMessage(log, electMessage, logicalLocalClock);
+
         if (node.getNodeAddress().getNodeId() < electMessage.address.getNodeId())
         {
             messageSender.sendMessageToNext(electMessage);
@@ -193,20 +218,21 @@ public class MessageProcessorImpl implements MessageProcessor {
 
         if (!node.isVoting() && node.getNodeAddress().getNodeId() > electMessage.address.getNodeId())
         {
-            messageSender.sendMessageToNext(new ElectMessage(node.getNodeAddress()));
+            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, node.getNodeAddress()));
         }
 
         if (node.getNodeAddress().getNodeId().equals(electMessage.address.getNodeId()))
         {
-            ElectedMessage electedMessage = new ElectedMessage(node.getNodeAddress());
+            ElectedMessage electedMessage = new ElectedMessage(logicalLocalClock, node.getNodeAddress());
             messageSender.sendMessageToNext(electedMessage);
         }
     }
 
     @Override
     public void processElectedMessage(ElectedMessage electedMessage) {
+        LoggingUtil.logReceivingMessage(log, electedMessage, logicalLocalClock, "Setting new leader to: " + electedMessage.leaderAddress);
+
         node.setLeader(electedMessage.leaderAddress);
-        log.info("Setting new leader to: " + electedMessage.leaderAddress);
 
         if (!electedMessage.leaderAddress.equals(node.getNodeAddress()))
         {
@@ -217,23 +243,22 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processHeartbeatMessage(HeartbeatMessage heartbeatMessage) {
-        log.info("Received heartbeat from: " + heartbeatMessage.SenderNodeAddress);
-        log.info("Responding to heartbeat");
+        LoggingUtil.logReceivingMessage(log, heartbeatMessage, logicalLocalClock, "Responding to heartbeat");
 
-        messageSender.sendMessageToAddress(new HeartbeatMessageResponse(node.getNodeAddress()), heartbeatMessage.SenderNodeAddress);
+        messageSender.sendMessageToAddress(new HeartbeatMessageResponse(logicalLocalClock, node.getNodeAddress()), heartbeatMessage.senderNodeAddress);
     }
 
     @Override
     public void processHeartbeatMessageResponse(HeartbeatMessageResponse heartbeatMessageResponse) {
-        log.info("Received heartbeat from: " + heartbeatMessageResponse.senderNodeAddress);
+        LoggingUtil.logReceivingMessage(log, heartbeatMessageResponse, logicalLocalClock);
 
         heartbeatService.heartbeatReceived();
     }
 
     @Override
     public void processRepairMyNextNextMessage(RepairMyNextNextMessage repairMyNextNextMessage) {
-        log.info("REPAIR: Sending new next next to new prev.");
+        LoggingUtil.logReceivingMessage(log, repairMyNextNextMessage, logicalLocalClock, "REPAIR: Sending new next next to new prev.");
 
-        messageSender.sendMessageToAddress(new NewNextNextMessage(node.getNeighbours().next), repairMyNextNextMessage.senderNodeAddress);
+        messageSender.sendMessageToAddress(new NewNextNextMessage(logicalLocalClock, node.getNeighbours().next), repairMyNextNextMessage.senderNodeAddress);
     }
 }

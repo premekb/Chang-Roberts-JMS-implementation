@@ -1,11 +1,13 @@
 package ctu.fee.dsv.sem.communication.messages;
 
 import ctu.fee.dsv.sem.Neighbours;
+import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 
 public class LoginMessageResponse extends Message {
     public final Neighbours neighbours;
-    public LoginMessageResponse(Neighbours neighbours) {
+    public LoginMessageResponse(LogicalLocalClock logicalLocalClock, Neighbours neighbours) {
+        super(logicalLocalClock);
         this.neighbours = neighbours;
     }
 
@@ -16,6 +18,6 @@ public class LoginMessageResponse extends Message {
 
     @Override
     public String toString() {
-        return "Neighbours from login: " + neighbours;
+        return super.toString() +  "Neighbours: " + neighbours;
     }
 }

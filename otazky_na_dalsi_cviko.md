@@ -1,2 +1,2 @@
-- Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel?
-- 
+- Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel? 
+- Anebo to bude zpusobovat problemy a mel bych spis celou komnikaci zpracovavat synchronne?

@@ -1,14 +1,14 @@
 package ctu.fee.dsv.sem;
 
+import ctu.fee.dsv.sem.clock.LogicalLocalClock;
+import ctu.fee.dsv.sem.clock.LogicalLocalClockImpl;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.facade.*;
-import ctu.fee.dsv.sem.communication.messages.GetSharedVariableMessage;
 import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
 import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
 import ctu.fee.dsv.sem.communication.util.NeighboursEdgeCaseUtil;
-import ctu.fee.dsv.sem.communication.wrapper.MessageConsumer;
 import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
 import ctu.fee.dsv.sem.communication.messages.LoginMessage;
 import ctu.fee.dsv.sem.communication.messages.Message;
@@ -39,19 +39,22 @@ public class NodeImpl implements Node, Runnable {
 
     private final HeartbeatService heartbeatService;
 
+    private final LogicalLocalClock logicalLocalClock;
+
     private final Session session;
 
     private boolean voting = false;
 
     public NodeImpl(NodeConfiguration cfg, Session session) {
+        this.logicalLocalClock = new LogicalLocalClockImpl();
         this.session = session;
         address = new NodeAddress(cfg.getNodeName(), cfg.getId());
         initialNodeAddress = new NodeAddress(cfg.getLoginNodeName(), cfg.getLoginNodeId());
         neighbours = new Neighbours(address);
         this.messageSender = new MessageSenderImpl(session, address, neighbours);
         this.messageReceiver = new MessageReceiverImpl(this, session);
-        this.heartbeatService = new HeartbeatServiceImpl(messageSender, this);
-        this.messageProcessor = new MessageProcessorImpl(this, messageSender, heartbeatService);
+        this.heartbeatService = new HeartbeatServiceImpl(messageSender, this, logicalLocalClock);
+        this.messageProcessor = new MessageProcessorImpl(this, messageSender, heartbeatService, logicalLocalClock);
         this.sharedVariable = new LocalStringSharedVariable();
     }
 
@@ -106,7 +109,7 @@ public class NodeImpl implements Node, Runnable {
     private void login() {
         log.info("Trying to login to node: " + initialNodeAddress.toString());
         MessageConsumerImpl consumer = new MessageConsumerImpl(session, address, true);
-        messageSender.sendMessageToAddress(new LoginMessage(address), initialNodeAddress);
+        messageSender.sendMessageToAddress(new LoginMessage(logicalLocalClock, address), initialNodeAddress);
 
         Message response = consumer.tryGetMessage(2000);
 
@@ -117,7 +120,7 @@ public class NodeImpl implements Node, Runnable {
 
         else
         {
-            sharedVariable = new RemoteStringSharedVariable(messageSender);
+            sharedVariable = new RemoteStringSharedVariable(messageSender, logicalLocalClock);
             processMessage(response);
             log.info("Login successful.");
         }
@@ -203,13 +206,13 @@ public class NodeImpl implements Node, Runnable {
         }
         else
         {
-            messageSender.sendMessageToNext(new RepairMyNextNextMessage(address));
+            messageSender.sendMessageToNext(new RepairMyNextNextMessage(logicalLocalClock, address));
         }
 
         // NNEXTOVI POSLI ZE JSI JEHO PREV
-        messageSender.sendMessageToNext(new NewPrevMessage(this.address)); // Tohle mozna nemusi probehnout, on to pozna z te zpravy?
+        messageSender.sendMessageToNext(new NewPrevMessage(logicalLocalClock, this.address)); // Tohle mozna nemusi probehnout, on to pozna z te zpravy?
         // PREVOVI POSLI NOVY NNEXT
-        messageSender.sendMessageToPrev(new NewNextNextMessage(neighbours.next));
+        messageSender.sendMessageToPrev(new NewNextNextMessage(logicalLocalClock, neighbours.next));
         // LEADER ELECTION JESTLI UMREL LEADER
         if (leaderMissing)
         {
@@ -219,6 +222,6 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void startElection() {
-        processMessage(new ElectMessage(getNeighbours().prev));
+        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev));
     }
 }

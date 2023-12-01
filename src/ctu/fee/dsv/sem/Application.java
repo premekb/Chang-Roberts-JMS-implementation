@@ -64,7 +64,8 @@ public class Application {
     }
 
     private static void configureLogger(NodeConfiguration nodeConfiguration) throws IOException {
-        FileHandler fileHandler = new FileHandler(nodeConfiguration.getNodeName() + ".txt");
+        FileHandler fileHandler = new FileHandler(nodeConfiguration.getId() + " " + nodeConfiguration.getNodeName() + ".txt");
+        fileHandler.setFormatter(new LogFormatter());
 
         // Add file handler as
         // handler of logs
@@ -72,18 +73,21 @@ public class Application {
 
         ROOT_LOGGER.removeHandler(ROOT_LOGGER.getHandlers()[0]);
         java.util.logging.ConsoleHandler consoleHandler = new java.util.logging.ConsoleHandler();
-        consoleHandler.setFormatter(new SimpleFormatter() {
-            private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
-
-            @Override
-            public synchronized String format(LogRecord lr) {
-                return String.format(format,
-                        new Date(lr.getMillis()),
-                        lr.getLevel().getLocalizedName(),
-                        lr.getMessage()
-                );
-            }
-        });
+        consoleHandler.setFormatter(new LogFormatter());
         ROOT_LOGGER.addHandler(consoleHandler);
+    }
+
+    private static class LogFormatter extends SimpleFormatter
+    {
+        private static final String format = "[%2$-7s] %3$s %n";
+
+        @Override
+        public synchronized String format(LogRecord lr) {
+            return String.format(format,
+                    new Date(lr.getMillis()),
+                    lr.getLevel().getLocalizedName(),
+                    lr.getMessage()
+            );
+        }
     }
 }

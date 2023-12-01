@@ -1,6 +1,7 @@
 package ctu.fee.dsv.sem.communication.messages.neighbourchange;
 
 import ctu.fee.dsv.sem.NodeAddress;
+import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 import ctu.fee.dsv.sem.communication.messages.Message;
 
@@ -11,7 +12,8 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 public class RepairMyNextNextMessage extends Message {
     public final NodeAddress senderNodeAddress;
 
-    public RepairMyNextNextMessage(NodeAddress senderNodeAddress) {
+    public RepairMyNextNextMessage(LogicalLocalClock logicalLocalClock, NodeAddress senderNodeAddress) {
+        super(logicalLocalClock);
         this.senderNodeAddress = senderNodeAddress;
     }
 
