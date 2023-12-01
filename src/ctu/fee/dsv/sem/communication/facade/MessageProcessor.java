@@ -36,4 +36,6 @@ public interface MessageProcessor {
     void processHeartbeatMessageResponse(HeartbeatMessageResponse heartbeatMessageResponse);
 
     void processRepairMyNextNextMessage(RepairMyNextNextMessage repairMyNextNextMessage);
+
+    void processExploreTopologyMessage(ExploreTopologyMessage exploreTopologyMessage);
 }

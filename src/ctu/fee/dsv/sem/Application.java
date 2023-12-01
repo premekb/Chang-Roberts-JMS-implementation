@@ -74,7 +74,7 @@ public class Application {
         ROOT_LOGGER.removeHandler(ROOT_LOGGER.getHandlers()[0]);
         java.util.logging.ConsoleHandler consoleHandler = new java.util.logging.ConsoleHandler();
         consoleHandler.setFormatter(new LogFormatter());
-        ROOT_LOGGER.addHandler(consoleHandler);
+        // ROOT_LOGGER.addHandler(consoleHandler);
     }
 
     private static class LogFormatter extends SimpleFormatter

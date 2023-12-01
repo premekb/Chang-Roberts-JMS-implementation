@@ -29,4 +29,6 @@ public interface Node extends Runnable {
     void repairNextNodeMissing();
 
     void startElection();
+
+    SystemTopology getSystemTopology();
 }

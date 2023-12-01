@@ -25,6 +25,8 @@ public class NodeImpl implements Node, Runnable {
     private static final Logger log = Logger.getLogger(NodeImpl.class.toString());
     private StringSharedVariable sharedVariable; // Tohle by mohla byt proxy classa a jestli bude node leader tak bude jina implementace nez kdyz neni leader
 
+    private SystemTopology systemTopology;
+
     private Neighbours neighbours;
 
     private final NodeAddress address;
@@ -56,6 +58,7 @@ public class NodeImpl implements Node, Runnable {
         this.heartbeatService = new HeartbeatServiceImpl(messageSender, this, logicalLocalClock);
         this.messageProcessor = new MessageProcessorImpl(this, messageSender, heartbeatService, logicalLocalClock);
         this.sharedVariable = new LocalStringSharedVariable();
+        this.systemTopology = new SystemTopology(messageSender, logicalLocalClock);
     }
 
 
@@ -223,5 +226,10 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void startElection() {
         processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev));
+    }
+
+    @Override
+    public SystemTopology getSystemTopology() {
+        return systemTopology;
     }
 }

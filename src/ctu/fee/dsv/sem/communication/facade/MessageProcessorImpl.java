@@ -105,8 +105,8 @@ public class MessageProcessorImpl implements MessageProcessor {
                 );
         node.setNeighbours(myNewNeighbours);
 
-        log.info("Responded to login message from: " + loginMessage.senderNodeAddress + "\n" +
-                "With neighbours: " + newNeighbours);
+        log.info("Responded to login message from: " + loginMessage.senderNodeAddress +
+                " With neighbours: " + newNeighbours);
     }
 
     @Override
@@ -260,5 +260,21 @@ public class MessageProcessorImpl implements MessageProcessor {
         LoggingUtil.logReceivingMessage(log, repairMyNextNextMessage, logicalLocalClock, "REPAIR: Sending new next next to new prev.");
 
         messageSender.sendMessageToAddress(new NewNextNextMessage(logicalLocalClock, node.getNeighbours().next), repairMyNextNextMessage.senderNodeAddress);
+    }
+
+    @Override
+    public void processExploreTopologyMessage(ExploreTopologyMessage exploreTopologyMessage)
+    {
+        ExploreTopologyMessage updatedMessage = exploreTopologyMessage.createAppendedMessage(logicalLocalClock, node.getNodeAddress());
+
+        if (exploreTopologyMessage.originalSenderNodeAddress.equals(node.getNodeAddress()))
+        {
+            LoggingUtil.logReceivingMessage(log, exploreTopologyMessage, logicalLocalClock, "System topology result.");
+            node.getSystemTopology().setCachedResultFromResponse(updatedMessage.getTopology());
+            return;
+        }
+
+        LoggingUtil.logReceivingMessage(log, exploreTopologyMessage, logicalLocalClock);
+        messageSender.sendMessageToNext(updatedMessage);
     }
 }

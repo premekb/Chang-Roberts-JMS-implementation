@@ -35,6 +35,7 @@ public class ConsoleHandler implements Runnable {
             System.out.println("set {content} - set the content of the shared variable");
             System.out.println("election - start a new election");
             System.out.println("status - print node status");
+            System.out.println("topology - print topology");
             System.out.println("logout - exit with informing other nodes");
             System.out.println("terminate - exits without logout");
         } else if (commandline.equals("get")) {
@@ -51,6 +52,10 @@ public class ConsoleHandler implements Runnable {
         else if (commandline.equals("status"))
         {
             System.out.println(node.toString());
+        }
+        else if (commandline.equals("topology"))
+        {
+            System.out.println(node.getSystemTopology().getData());
         }
         else if (commandline.equals("logout"))
         {
