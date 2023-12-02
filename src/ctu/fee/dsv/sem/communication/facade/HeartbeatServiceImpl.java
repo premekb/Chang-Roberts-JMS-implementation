@@ -11,7 +11,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
 
     private static final Logger log = Logger.getLogger(HeartbeatServiceImpl.class.toString());
 
-    private static Integer  CHECKING_PERIOD = 1_000;
+    private static Integer  CHECKING_PERIOD = 100_000;
     private final MessageSender messageSender;
 
     private final Node node;

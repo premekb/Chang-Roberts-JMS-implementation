@@ -7,10 +7,7 @@ import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.messages.*;
 import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
 import ctu.fee.dsv.sem.communication.messages.election.ElectedMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.*;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import ctu.fee.dsv.sem.util.LoggingUtil;
@@ -275,5 +272,22 @@ public class MessageProcessorImpl implements MessageProcessor {
         ExploreTopologyMessage updatedMessage = exploreTopologyMessage.createAppendedMessage(logicalLocalClock, node.getNodeAddress());
         LoggingUtil.logReceivingMessage(log, exploreTopologyMessage, logicalLocalClock);
         messageSender.sendMessageToNext(updatedMessage);
+    }
+
+    @Override
+    public void processNewNeighboursMessage(NewNeighboursMessage newNeighboursMessage) {
+        LoggingUtil.logReceivingMessage(log, newNeighboursMessage, logicalLocalClock);
+
+        node.setNeighbours(newNeighboursMessage.neighbours);
+    }
+
+    /**
+     * Used for logout.
+     */
+    @Override
+    public void processSetNextNextOnYourPrev(SetNextNextOnYourPrev setYourNeighboursOnYourPrevMessage) {
+        LoggingUtil.logReceivingMessage(log, setYourNeighboursOnYourPrevMessage, logicalLocalClock);
+
+        messageSender.sendMessageToPrev(new NewNextNextMessage(logicalLocalClock, node.getNeighbours().nnext));
     }
 }

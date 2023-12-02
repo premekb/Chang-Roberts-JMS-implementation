@@ -5,9 +5,7 @@ import ctu.fee.dsv.sem.clock.LogicalLocalClockImpl;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.facade.*;
 import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewNextNextMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.NewPrevMessage;
-import ctu.fee.dsv.sem.communication.messages.neighbourchange.RepairMyNextNextMessage;
+import ctu.fee.dsv.sem.communication.messages.neighbourchange.*;
 import ctu.fee.dsv.sem.communication.util.NeighboursEdgeCaseUtil;
 import ctu.fee.dsv.sem.communication.wrapper.MessageConsumerImpl;
 import ctu.fee.dsv.sem.communication.messages.LoginMessage;
@@ -15,7 +13,6 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -84,7 +81,6 @@ public class NodeImpl implements Node, Runnable {
         }
     }
 
-    // TODO checki asi jestli jsem leader nebo ne, kdyztak zkontrolovat, ze tam je remote
     @Override
     public StringSharedVariable getSharedVariable() {
         return sharedVariable;
@@ -98,11 +94,52 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void logout() {
         log.info("Logging out.");
-        // Nexte, zmen si prev na meho prev
-        // Preve, prevezmi moje neighbours.
-        // Preve, predej svoje neighbours svojemu prevovi.
 
-        throw new NotImplementedException();
+        if (NeighboursEdgeCaseUtil.isOneNodeConfig(neighbours))
+        {
+            System.exit(0);
+        }
+
+        else if (NeighboursEdgeCaseUtil.isTwoNodesConfig(neighbours))
+        {
+            messageSender.sendMessageToNext(new NewNeighboursMessage(
+                    logicalLocalClock,
+                    new Neighbours(neighbours.next, neighbours.next, neighbours.next, neighbours.next)
+                    ));
+        }
+
+        else if (NeighboursEdgeCaseUtil.isThreeNodesConfig(neighbours))
+        {
+            messageSender.sendMessageToNext(new NewNeighboursMessage(
+                    logicalLocalClock,
+                    new Neighbours(neighbours.leader, neighbours.prev, neighbours.next, neighbours.prev)
+            ));
+
+            messageSender.sendMessageToPrev(new NewNeighboursMessage(
+                    logicalLocalClock,
+                    new Neighbours(neighbours.leader, neighbours.next, neighbours.prev, neighbours.next)
+            ));
+        }
+
+        else
+        {
+            // Nexte, zmen si prev na meho prev
+            messageSender.sendMessageToNext(new NewPrevMessage(logicalLocalClock, neighbours.prev));
+
+            // Preve, rekni svojemu prevovi at si prenastavi nnext
+            messageSender.sendMessageToPrev(new SetNextNextOnYourPrev(logicalLocalClock));
+
+            // Preve, prevezmi moje neighbours.
+            messageSender.sendMessageToPrev(new NewNextMessage(logicalLocalClock, neighbours.next));
+            messageSender.sendMessageToPrev(new NewNextNextMessage(logicalLocalClock, neighbours.nnext));
+        }
+
+        // Zacni election jestli sem leader
+        if (neighbours.leader.equals(address))
+        {
+            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, neighbours.prev));
+        }
+        System.exit(0);
     }
 
     @Override
@@ -183,6 +220,11 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void setLeader(NodeAddress address) {
+        if (this.address.equals(address) && !(sharedVariable instanceof LocalStringSharedVariable))
+        {
+            sharedVariable = new LocalStringSharedVariable();
+        }
+
         setNeighbours(new Neighbours(
                 address,
                 neighbours.next,
