@@ -33,6 +33,11 @@ public class MessageSenderImpl implements MessageSender {
 
     @Override
     public void setNewReceivers(NodeAddress next, NodeAddress nnext, NodeAddress prev, NodeAddress leader) {
+        producerForNext.close();
+        producerForNextNext.close();
+        producerForPrev.close();
+        producerForLeader.close();
+
         producerForNext = new MessageProducerImpl(session, senderAddress, next);
         producerForNextNext = new MessageProducerImpl(session, senderAddress, nnext);
         producerForPrev = new MessageProducerImpl(session, senderAddress, prev);
@@ -61,7 +66,9 @@ public class MessageSenderImpl implements MessageSender {
 
     @Override
     public void sendMessageToAddress(Message message, NodeAddress destinationAddress) {
-        new MessageProducerImpl(session, senderAddress, destinationAddress).sendMessage(message);
+        MessageProducerImpl producer = new MessageProducerImpl(session, senderAddress, destinationAddress);
+        producer.sendMessage(message);
+        producer.close();
     }
 
     @Override

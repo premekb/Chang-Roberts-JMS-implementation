@@ -17,6 +17,8 @@ import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.jms.Connection;
+import javax.jms.JMSException;
 import javax.jms.Session;
 import java.util.logging.Logger;
 
@@ -43,13 +45,17 @@ public class NodeImpl implements Node, Runnable {
 
     private final LogicalLocalClock logicalLocalClock;
 
+    private final Connection connection;
+
     private final Session session;
 
     private boolean voting = false;
 
-    public NodeImpl(NodeConfiguration cfg, Session session) {
+
+    public NodeImpl(NodeConfiguration cfg, Connection connection) throws JMSException {
         this.logicalLocalClock = new LogicalLocalClockImpl();
-        this.session = session;
+        this.connection = connection;
+        this.session = connection.createSession();
         address = new NodeAddress(cfg.getNodeName(), cfg.getId());
         initialNodeAddress = new NodeAddress(cfg.getLoginNodeName(), cfg.getLoginNodeId());
         neighbours = new Neighbours(address);
@@ -102,6 +108,12 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void terminateWithoutLogout() {
         log.warning("TERMINATING WITHOUT LETTING OTHER NODES KNOW.");
+        try {
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            System.exit(1);
+        }
         System.exit(1);
     }
 
@@ -114,7 +126,7 @@ public class NodeImpl implements Node, Runnable {
         MessageConsumerImpl consumer = new MessageConsumerImpl(session, address, true);
         messageSender.sendMessageToAddress(new LoginMessage(logicalLocalClock, address), initialNodeAddress);
 
-        Message response = consumer.tryGetMessage(2000);
+        Message response = consumer.tryGetMessage(1000);
 
         if (response == null)
         {

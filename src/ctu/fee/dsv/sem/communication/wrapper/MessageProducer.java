@@ -5,4 +5,6 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 
 public interface MessageProducer {
     void sendMessage(Message message);
+
+    void close();
 }

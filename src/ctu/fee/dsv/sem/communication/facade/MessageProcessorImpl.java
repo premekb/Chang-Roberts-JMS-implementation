@@ -265,15 +265,14 @@ public class MessageProcessorImpl implements MessageProcessor {
     @Override
     public void processExploreTopologyMessage(ExploreTopologyMessage exploreTopologyMessage)
     {
-        ExploreTopologyMessage updatedMessage = exploreTopologyMessage.createAppendedMessage(logicalLocalClock, node.getNodeAddress());
-
         if (exploreTopologyMessage.originalSenderNodeAddress.equals(node.getNodeAddress()))
         {
             LoggingUtil.logReceivingMessage(log, exploreTopologyMessage, logicalLocalClock, "System topology result.");
-            node.getSystemTopology().setCachedResultFromResponse(updatedMessage.getTopology());
+            node.getSystemTopology().setCachedResultFromResponse(exploreTopologyMessage.getTopology());
             return;
         }
 
+        ExploreTopologyMessage updatedMessage = exploreTopologyMessage.createAppendedMessage(logicalLocalClock, node.getNodeAddress());
         LoggingUtil.logReceivingMessage(log, exploreTopologyMessage, logicalLocalClock);
         messageSender.sendMessageToNext(updatedMessage);
     }

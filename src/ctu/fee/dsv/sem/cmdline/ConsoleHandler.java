@@ -30,14 +30,7 @@ public class ConsoleHandler implements Runnable {
     private void parse_commandline(String commandline) {
         String[] splitCmdline = commandline.split(" ");
         if (commandline.equals("?")) {
-            System.out.println("? - this help");
-            System.out.println("get - get the content of the shared variable");
-            System.out.println("set {content} - set the content of the shared variable");
-            System.out.println("election - start a new election");
-            System.out.println("status - print node status");
-            System.out.println("topology - print topology");
-            System.out.println("logout - exit with informing other nodes");
-            System.out.println("terminate - exits without logout");
+            printHelp();
         } else if (commandline.equals("get")) {
             System.out.println("Shared variable content: " + node.getSharedVariable().getData());
         }
@@ -55,7 +48,8 @@ public class ConsoleHandler implements Runnable {
         }
         else if (commandline.equals("topology"))
         {
-            System.out.println(node.getSystemTopology().getData());
+            String topology = node.getSystemTopology().getData();
+            System.out.println(topology);
         }
         else if (commandline.equals("logout"))
         {
@@ -68,7 +62,6 @@ public class ConsoleHandler implements Runnable {
             System.exit(1);
         }
          else {
-            // do nothing
             System.out.print("Unrecognized command.");
         }
     }
@@ -77,6 +70,7 @@ public class ConsoleHandler implements Runnable {
     @Override
     public void run() {
         String commandline = "";
+        printHelp();
         while (reading == true) {
             commandline = "";
             System.out.print("\ncmd > ");
@@ -90,5 +84,16 @@ public class ConsoleHandler implements Runnable {
             }
         }
         System.out.println("Closing ConsoleHandler.");
+    }
+
+    private void printHelp() {
+        System.out.println("? - this help");
+        System.out.println("get - get the content of the shared variable");
+        System.out.println("set {content} - set the content of the shared variable");
+        System.out.println("election - start a new election");
+        System.out.println("status - print node status");
+        System.out.println("topology - print topology");
+        System.out.println("logout - exit with informing other nodes");
+        System.out.println("terminate - exits without logout");
     }
 }

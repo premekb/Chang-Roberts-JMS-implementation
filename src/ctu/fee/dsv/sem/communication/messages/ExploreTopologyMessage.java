@@ -7,23 +7,17 @@ import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 public class ExploreTopologyMessage extends Message {
     public final NodeAddress originalSenderNodeAddress;
 
-    private String topology = "";
+    private String topology;
     public ExploreTopologyMessage(LogicalLocalClock logicalLocalClock, NodeAddress originalSenderNodeAddress) {
         super(logicalLocalClock);
         this.originalSenderNodeAddress = originalSenderNodeAddress;
+        this.topology = originalSenderNodeAddress.toString();
     }
 
     public ExploreTopologyMessage createAppendedMessage(LogicalLocalClock logicalLocalClock, NodeAddress currentSender)
     {
         ExploreTopologyMessage message = new ExploreTopologyMessage(logicalLocalClock, originalSenderNodeAddress);
-        if (topology.isEmpty())
-        {
-            message.setTopology(currentSender.toString());
-        }
-        else
-        {
-            message.setTopology(currentSender.toString() + " - "  + topology);
-        }
+        message.setTopology(topology + " - " + currentSender.toString());
         return message;
     }
 

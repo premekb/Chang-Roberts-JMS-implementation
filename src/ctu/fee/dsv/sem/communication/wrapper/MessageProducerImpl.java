@@ -39,4 +39,13 @@ public class MessageProducerImpl implements MessageProducer{
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void close() {
+        try {
+            jmsProducer.close();
+        } catch (JMSException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
