@@ -39,10 +39,10 @@ public class NodeConfiguration {
         return new NodeConfiguration(
                 Integer.parseInt(cmdArgs[0]),
                 cmdArgs[1],
-                cmdArgs[2],
-                "http://" + cmdArgs[2] + "/imq/tunnel",
                 cmdArgs[4],
-                Integer.parseInt(cmdArgs[3])
+                "http://" + cmdArgs[4] + "/imq/tunnel",
+                cmdArgs[3],
+                Integer.parseInt(cmdArgs[2])
         );
     }
 

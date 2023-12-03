@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class NodeImpl implements Node, Runnable {
 
     private static final Logger log = Logger.getLogger(NodeImpl.class.toString());
-    private StringSharedVariable sharedVariable; // Tohle by mohla byt proxy classa a jestli bude node leader tak bude jina implementace nez kdyz neni leader
+    private StringSharedVariable sharedVariable;
 
     private SystemTopology systemTopology;
 

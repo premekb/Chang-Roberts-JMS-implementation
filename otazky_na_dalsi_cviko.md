@@ -1,3 +1,5 @@
 - Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel? 
 - Anebo to bude zpusobovat problemy a mel bych spis celou komnikaci zpracovavat synchronne?
 - Chapu zadani spravne? Leader slouzi k tomu, aby drzel obsah promenne a ostatni k nemu pristupovali.
+- Davkove rizeni?? Co tim mysli?
+- Zpozdovani zprav? Jak bych to mel udelat? Jak se tam muze stat soubeh, kdyz mam jednoho consumera?

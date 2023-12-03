@@ -22,7 +22,7 @@ public class Application {
     public static void main(String[] args) throws JMSException, IOException {
         NodeConfiguration nodeCfg = initNodeCfg(args);
         configureLogger(nodeCfg);
-        Connection connection = initJmsConnection();
+        Connection connection = initJmsConnection(nodeCfg);
 
         Node node = new NodeImpl(nodeCfg, connection);
         ConsoleHandler consoleHandler = new ConsoleHandler(node);
@@ -30,10 +30,10 @@ public class Application {
         node.run();
     }
 
-    private static Connection initJmsConnection() throws JMSException {
+    private static Connection initJmsConnection(NodeConfiguration nodeCfg) throws JMSException {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setProperty(IMQ_BROKER_HOST_NAME_KEY, "localhost");
-        connectionFactory.setProperty(IMQ_CONNECTION_URL_KEY, "http://localhost/imq/tunnel");
+        connectionFactory.setProperty(IMQ_BROKER_HOST_NAME_KEY, nodeCfg.getBrokerHostname());
+        connectionFactory.setProperty(IMQ_CONNECTION_URL_KEY, nodeCfg.getBrokerUrl());
         Connection connection = connectionFactory.createConnection();
         connection.start();
         return connection;
