@@ -18,6 +18,10 @@ public class Application {
 
     private static final String IMQ_CONNECTION_URL_KEY = "imqConnectionURL";
 
+    private static final String IMQ_ACK_TIMEOUT_KEY = "imqAckTimeout";
+
+    private static final String IMQ_ACK_TIMEOUT_VALUE = "1000";
+
     private static final Logger ROOT_LOGGER = Logger.getLogger("");
     public static void main(String[] args) throws JMSException, IOException {
         NodeConfiguration nodeCfg = initNodeCfg(args);
@@ -34,6 +38,7 @@ public class Application {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setProperty(IMQ_BROKER_HOST_NAME_KEY, nodeCfg.getBrokerHostname());
         connectionFactory.setProperty(IMQ_CONNECTION_URL_KEY, nodeCfg.getBrokerUrl());
+        connectionFactory.setProperty(IMQ_ACK_TIMEOUT_KEY, IMQ_ACK_TIMEOUT_VALUE);
         Connection connection = connectionFactory.createConnection();
         connection.start();
         return connection;
