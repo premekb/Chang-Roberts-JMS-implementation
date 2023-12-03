@@ -32,10 +32,15 @@ public class HeartbeatServiceImpl implements HeartbeatService {
      */
     @Override
     public void run() {
-        startSendingHeartbeat();
+        try {
+            startSendingHeartbeat();
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void startSendingHeartbeat(){
+    private void startSendingHeartbeat() throws InterruptedException {
         try {
             messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
             Thread.sleep(CHECKING_PERIOD);
@@ -52,11 +57,9 @@ public class HeartbeatServiceImpl implements HeartbeatService {
             }
         }
         catch (ProducerClosingException e) {
-            log.severe("FAILED TO SEND HEARTBEAT. TRYING AGAIN.");
+            log.severe("FAILED TO SEND HEARTBEAT, PRODUCER IN CLOSING STATE. TRYING AGAIN.");
+            Thread.sleep(500);
             startSendingHeartbeat();
-        }
-        catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 
