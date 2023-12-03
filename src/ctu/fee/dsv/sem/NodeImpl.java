@@ -70,7 +70,6 @@ public class NodeImpl implements Node, Runnable {
         // tady jsou neighbours sami na sebe
         login();
         messageReceiver.startListeningToMessages();
-        new Thread(heartbeatService).start();
         while (true)
         {
             try {
@@ -177,6 +176,7 @@ public class NodeImpl implements Node, Runnable {
             log.info("Login successful.");
         }
         consumer.close();
+        new Thread(heartbeatService).start();
     }
 
     @Override
