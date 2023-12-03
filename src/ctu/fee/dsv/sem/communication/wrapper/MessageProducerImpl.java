@@ -1,10 +1,12 @@
 package ctu.fee.dsv.sem.communication.wrapper;
 
 import ctu.fee.dsv.sem.NodeAddress;
+import ctu.fee.dsv.sem.ProducerClosingException;
 import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.communication.util.QueueNameUtil;
 
 import javax.jms.*;
+import javax.jms.IllegalStateException;
 import java.util.logging.Logger;
 
 public class MessageProducerImpl implements MessageProducer{
@@ -36,7 +38,15 @@ public class MessageProducerImpl implements MessageProducer{
             log.info("SENT     " + message.toString() +  " To queue: " + queueName);
         } catch (JMSException e) {
             log.severe("FAILED   " + e.getMessage());
-            throw new RuntimeException(e);
+            if (e instanceof IllegalStateException)
+            {
+                throw new ProducerClosingException(e.getMessage());
+            }
+
+            else
+            {
+                throw new RuntimeException(e);
+            }
         }
     }
 

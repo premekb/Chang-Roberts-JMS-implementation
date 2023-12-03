@@ -2,6 +2,7 @@ package ctu.fee.dsv.sem.communication.facade;
 
 import ctu.fee.dsv.sem.Node;
 import ctu.fee.dsv.sem.NodeImpl;
+import ctu.fee.dsv.sem.ProducerClosingException;
 import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.communication.messages.HeartbeatMessage;
 
@@ -31,6 +32,10 @@ public class HeartbeatServiceImpl implements HeartbeatService {
      */
     @Override
     public void run() {
+        startSendingHeartbeat();
+    }
+
+    private void startSendingHeartbeat(){
         try {
             messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
             Thread.sleep(CHECKING_PERIOD);
@@ -45,7 +50,12 @@ public class HeartbeatServiceImpl implements HeartbeatService {
                 messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
                 Thread.sleep(CHECKING_PERIOD);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (ProducerClosingException e) {
+            log.severe("FAILED TO SEND HEARTBEAT. TRYING AGAIN.");
+            startSendingHeartbeat();
+        }
+        catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
