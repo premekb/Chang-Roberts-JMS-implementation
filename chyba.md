@@ -1,0 +1,1 @@
+Prepis to synchronne nejspis
