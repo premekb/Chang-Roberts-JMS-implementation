@@ -1,8 +1,8 @@
-- Chapu zadani spravne? Leader slouzi k tomu, aby drzel obsah promenne a ostatni k nemu pristupovali. 
+- Chapu zadani spravne? Leader slouzi k tomu, aby drzel obsah promenne a ostatni k nemu pristupovali. HOTOVO
 jj presne tak
 
 
-- Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel? 
+- Implementoval jsem posilani periodickeho heartbeatu. Je to takhle ok pro zjisteni, jestli nejaky node umrel? HOTOVO
 
 potvrzovani? heartbeat ok
 
@@ -19,7 +19,7 @@ zapinej to z cmd
 neplati, volba startuje na vice uzkech najednou, melo by to byt mozne nasimulovat
 soubeh ti je jedno
 
-- Zpracovavam zpravy asynchronne. Mozna sem si to udelal zbytecne moc slozite.
+- Zpracovavam zpravy asynchronne. Mozna sem si to udelal zbytecne moc slozite. V POHODE HOTOV
 checkni ipcka, mac adresy
 podivje se na nastaveni site ve ktere to komunikuje
 pozkousej telnety pingy a tak
