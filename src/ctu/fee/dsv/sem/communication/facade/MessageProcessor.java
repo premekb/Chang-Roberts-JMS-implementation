@@ -39,4 +39,6 @@ public interface MessageProcessor {
     void processNewNeighboursMessage(NewNeighboursMessage newNeighboursMessage);
 
     void processSetNextNextOnYourPrev(SetNextNextOnYourPrev setNextNextOnYourPrev);
+
+    void processCacheVariableFromLeader(CacheVariableFromLeader cacheVariableFromLeader);
 }

@@ -229,6 +229,13 @@ public class MessageProcessorImpl implements MessageProcessor {
     public void processElectedMessage(ElectedMessage electedMessage) {
         LoggingUtil.logReceivingMessage(log, electedMessage, logicalLocalClock, "Setting new leader to: " + electedMessage.leaderAddress);
 
+        // Ja jsem leader a nebyl jsem zvolen. Tak posli novemu leaderovi data.
+        if (node.getNeighbours().leader.equals(node.getNodeAddress()) && !electedMessage.leaderAddress.equals(node.getNodeAddress()))
+        {
+            CacheVariableFromLeader message = new CacheVariableFromLeader(logicalLocalClock, node.getSharedVariable().getData());
+            messageSender.sendMessageToAddress(message, electedMessage.leaderAddress);
+        }
+
         node.setLeader(electedMessage.leaderAddress);
 
         if (!electedMessage.leaderAddress.equals(node.getNodeAddress()))
@@ -289,5 +296,10 @@ public class MessageProcessorImpl implements MessageProcessor {
         LoggingUtil.logReceivingMessage(log, setYourNeighboursOnYourPrevMessage, logicalLocalClock);
 
         messageSender.sendMessageToPrev(new NewNextNextMessage(logicalLocalClock, node.getNeighbours().nnext));
+    }
+
+    @Override
+    public void processCacheVariableFromLeader(CacheVariableFromLeader cacheVariableFromLeader) {
+        node.setCacheVariable(cacheVariableFromLeader.data);
     }
 }

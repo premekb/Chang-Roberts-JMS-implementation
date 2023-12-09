@@ -48,6 +48,8 @@ public class NodeImpl implements Node, Runnable {
 
     private boolean voting = false;
 
+    private String cachedStringVariable = null;
+
 
     public NodeImpl(NodeConfiguration cfg, Connection connection) throws JMSException {
         this.logicalLocalClock = new LogicalLocalClockImpl();
@@ -222,7 +224,19 @@ public class NodeImpl implements Node, Runnable {
     public void setLeader(NodeAddress address) {
         if (this.address.equals(address) && !(sharedVariable instanceof LocalStringSharedVariable))
         {
+            if (cachedStringVariable == null) {
+                log.warning("Trying to wait for cached variable from leader.");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             sharedVariable = new LocalStringSharedVariable();
+            if (cachedStringVariable != null) {
+                log.info("Setting cached variable from leader: " + cachedStringVariable);
+                sharedVariable.setData(cachedStringVariable);
+            }
         }
 
         setNeighbours(new Neighbours(
@@ -231,6 +245,8 @@ public class NodeImpl implements Node, Runnable {
                 neighbours.nnext,
                 neighbours.prev
         ));
+
+        cachedStringVariable = null;
     }
 
     /**
@@ -285,5 +301,11 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public SystemTopology getSystemTopology() {
         return systemTopology;
+    }
+
+    @Override
+    public void setCacheVariable(String variable) {
+        log.info("Received cached variable from old leader.");
+        cachedStringVariable = variable;
     }
 }
