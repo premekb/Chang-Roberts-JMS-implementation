@@ -19,4 +19,9 @@ public abstract class Message implements Serializable {
     public String toString() {
         return "[LT-" + logicalTimestamp + "] " + this.getClass().getSimpleName();
     }
+
+    public boolean isDelayed()
+    {
+        return false;
+    }
 }

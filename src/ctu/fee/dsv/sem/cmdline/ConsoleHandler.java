@@ -42,6 +42,10 @@ public class ConsoleHandler implements Runnable {
         {
             node.startElection();
         }
+        else if (commandline.equals("delection"))
+        {
+            node.startDelayedElection();
+        }
         else if (commandline.equals("status"))
         {
             System.out.println(node.toString());
@@ -91,6 +95,7 @@ public class ConsoleHandler implements Runnable {
         System.out.println("get - get the content of the shared variable");
         System.out.println("set {content} - set the content of the shared variable");
         System.out.println("election - start a new election");
+        System.out.println("delection - start a new delayed election");
         System.out.println("status - print node status");
         System.out.println("topology - print topology");
         System.out.println("logout - exit with informing other nodes");

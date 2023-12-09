@@ -8,13 +8,21 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 public class ElectMessage extends Message {
     public final NodeAddress address;
 
-    public ElectMessage(LogicalLocalClock logicalLocalClock, NodeAddress address) {
+    private final boolean isDelayed;
+
+    public ElectMessage(LogicalLocalClock logicalLocalClock, NodeAddress address, boolean isDelayed) {
         super(logicalLocalClock);
         this.address = address;
+        this.isDelayed = isDelayed;
     }
 
     @Override
     public void process(MessageProcessor messageProcessor) {
         messageProcessor.processElectMessage(this);
+    }
+
+    @Override
+    public boolean isDelayed() {
+        return isDelayed;
     }
 }

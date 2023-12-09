@@ -11,6 +11,7 @@ import ctu.fee.dsv.sem.communication.messages.neighbourchange.*;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
 import ctu.fee.dsv.sem.util.LoggingUtil;
+import ctu.fee.dsv.sem.util.RandomUtil;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.logging.Logger;
@@ -215,12 +216,12 @@ public class MessageProcessorImpl implements MessageProcessor {
 
         if (!node.isVoting() && node.getNodeAddress().getNodeId() > electMessage.address.getNodeId())
         {
-            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, node.getNodeAddress()));
+            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, node.getNodeAddress(), electMessage.isDelayed()));
         }
 
         if (node.getNodeAddress().getNodeId().equals(electMessage.address.getNodeId()))
         {
-            ElectedMessage electedMessage = new ElectedMessage(logicalLocalClock, node.getNodeAddress());
+            ElectedMessage electedMessage = new ElectedMessage(logicalLocalClock, node.getNodeAddress(), electMessage.isDelayed());
             messageSender.sendMessageToNext(electedMessage);
         }
     }

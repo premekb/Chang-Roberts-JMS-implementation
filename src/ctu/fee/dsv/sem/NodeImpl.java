@@ -13,6 +13,7 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
+import ctu.fee.dsv.sem.util.RandomUtil;
 
 import javax.jms.Connection;
 import javax.jms.JMSException;
@@ -138,7 +139,7 @@ public class NodeImpl implements Node, Runnable {
         // Zacni election jestli sem leader
         if (neighbours.leader.equals(address))
         {
-            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, neighbours.prev));
+            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, neighbours.prev, false));
         }
         System.exit(0);
     }
@@ -193,6 +194,16 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void processMessage(Message message) {
+        if (message.isDelayed())
+        {
+            int waitTime = RandomUtil.getRandomNumber(1000, 2000);
+            log.warning("Delaying " + message + " processing by " + waitTime + " ms.");
+            try {
+                Thread.sleep(waitTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         message.process(messageProcessor);
     }
 
@@ -295,7 +306,12 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void startElection() {
-        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev));
+        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev, false));
+    }
+
+    @Override
+    public void startDelayedElection() {
+        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev, true));
     }
 
     @Override

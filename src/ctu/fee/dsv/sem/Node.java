@@ -30,6 +30,8 @@ public interface Node extends Runnable {
 
     void startElection();
 
+    void startDelayedElection();
+
     SystemTopology getSystemTopology();
 
     void setCacheVariable(String variable);
