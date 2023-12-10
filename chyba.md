@@ -9,3 +9,8 @@ Predej shared variable novemu leaderovi
 - Pri logoutu zapni novy election. Pokud logout zapl soucasny leader, tak at neparticipuje a pouze forwardne. DONE
 
 Pokud se zrovna votuje a uz je jiny leader. Ale nekdo to posle na stareho leadera, tak ten by to mel forwardnout.
+
+MARKOVANI SAMA SEBE JAKO VOTING A NOT VOTING
+LOGOUT uchovavani promenne kdyz se logoutuje leader
+- zacni novy election, jakmile je zvolen novy leader tak se odloguj a pomen neighbours
+- nastav se jako logging out a uz jenom forwarduj

@@ -209,7 +209,7 @@ public class MessageProcessorImpl implements MessageProcessor {
     public void processElectMessage(ElectMessage electMessage) {
         LoggingUtil.logReceivingMessage(log, electMessage, logicalLocalClock);
 
-        if (node.getNodeAddress().getNodeId() < electMessage.address.getNodeId())
+        if (node.getNodeAddress().getNodeId() < electMessage.address.getNodeId() || node.isLoggingOut())
         {
             messageSender.sendMessageToNext(electMessage);
         }
@@ -243,6 +243,11 @@ public class MessageProcessorImpl implements MessageProcessor {
         {
             log.info("Forwarding elected message to the next node.");
             messageSender.sendMessageToNext(electedMessage);
+        }
+
+        if (node.isLoggingOut())
+        {
+            node.finishLogout();
         }
     }
 

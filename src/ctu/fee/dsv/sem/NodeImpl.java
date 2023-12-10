@@ -13,6 +13,7 @@ import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.sharedvariable.LocalStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.RemoteStringSharedVariable;
 import ctu.fee.dsv.sem.sharedvariable.StringSharedVariable;
+import ctu.fee.dsv.sem.util.LoggingUtil;
 import ctu.fee.dsv.sem.util.RandomUtil;
 
 import javax.jms.Connection;
@@ -48,6 +49,8 @@ public class NodeImpl implements Node, Runnable {
     private final Session session;
 
     private boolean voting = false;
+
+    private boolean loggingOut = false;
 
     private String cachedStringVariable = null;
 
@@ -94,9 +97,23 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public void logout() {
+    public void startLogout() {
         log.info("Logging out.");
 
+        loggingOut = true;
+        if (neighbours.leader.equals(address))
+        {
+            startElection(); // finishlogout gets called when a new leader is elected
+        }
+
+        else
+        {
+            finishLogout();
+        }
+    }
+
+    @Override
+    public void finishLogout() {
         if (NeighboursEdgeCaseUtil.isOneNodeConfig(neighbours))
         {
             System.exit(0);
@@ -107,7 +124,7 @@ public class NodeImpl implements Node, Runnable {
             messageSender.sendMessageToNext(new NewNeighboursMessage(
                     logicalLocalClock,
                     new Neighbours(neighbours.next, neighbours.next, neighbours.next, neighbours.next)
-                    ));
+            ));
         }
 
         else if (NeighboursEdgeCaseUtil.isThreeNodesConfig(neighbours))
@@ -136,11 +153,6 @@ public class NodeImpl implements Node, Runnable {
             messageSender.sendMessageToPrev(new NewNextNextMessage(logicalLocalClock, neighbours.nnext));
         }
 
-        // Zacni election jestli sem leader
-        if (neighbours.leader.equals(address))
-        {
-            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, neighbours.prev, false));
-        }
         System.exit(0);
     }
 
@@ -250,6 +262,11 @@ public class NodeImpl implements Node, Runnable {
             }
         }
 
+        if (!this.address.equals(address) && sharedVariable instanceof LocalStringSharedVariable)
+        {
+            sharedVariable = new RemoteStringSharedVariable(messageSender, logicalLocalClock);
+        }
+
         setNeighbours(new Neighbours(
                 address,
                 neighbours.next,
@@ -323,5 +340,10 @@ public class NodeImpl implements Node, Runnable {
     public void setCacheVariable(String variable) {
         log.info("Received cached variable from old leader.");
         cachedStringVariable = variable;
+    }
+
+    @Override
+    public boolean isLoggingOut() {
+        return loggingOut;
     }
 }

@@ -8,7 +8,9 @@ public interface Node extends Runnable {
 
     void setSharedVariable(String data);
 
-    void logout();
+    void startLogout();
+
+    void finishLogout();
 
     void terminateWithoutLogout();
 
@@ -35,4 +37,6 @@ public interface Node extends Runnable {
     SystemTopology getSystemTopology();
 
     void setCacheVariable(String variable);
+
+    boolean isLoggingOut();
 }

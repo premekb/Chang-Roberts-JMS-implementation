@@ -1,7 +1,6 @@
 package ctu.fee.dsv.sem.cmdline;
 
 import ctu.fee.dsv.sem.Node;
-import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,8 +56,7 @@ public class ConsoleHandler implements Runnable {
         }
         else if (commandline.equals("logout"))
         {
-            node.logout();
-            System.exit(0);
+            node.startLogout();
         }
         else if (commandline.equals("terminate"))
         {
