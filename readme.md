@@ -21,7 +21,7 @@ java -jar artifact.jar 1 Alpha 2 Beta 192.168.64.2
 - get - dostaň hodnotu proměnné
 - set {content} - nastav hodnotu proměnné
 - election - začni volby
-- delection - začni volby, ve kterých jsou zprávy opožďovány o náhodný čas mezi 1s - 2s
+- delection - začni volby, ve kterých jsou zprávy opožďovány o 4 sekundy
 - status - vypiš sousedy a leadera
 - topology - vypiš topologii
 - logout - odhlaš se a informuj ostatní
