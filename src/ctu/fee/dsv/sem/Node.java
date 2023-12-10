@@ -39,4 +39,6 @@ public interface Node extends Runnable {
     void setCacheVariable(String variable);
 
     boolean isLoggingOut();
+
+    boolean shouldLogHeartbeat();
 }

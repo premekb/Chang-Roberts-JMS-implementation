@@ -7,10 +7,17 @@ import java.io.Serializable;
 
 public abstract class Message implements Serializable {
 
-    public final Integer logicalTimestamp;
+    protected Integer logicalTimestamp;
 
     public Message(LogicalLocalClock logicalLocalClock) {
         this.logicalTimestamp = logicalLocalClock.getTimestampAndIncrement();
+    }
+
+    protected Message(LogicalLocalClock logicalLocalClock, boolean logHeartbeat) {
+        if (logHeartbeat)
+        {
+            this.logicalTimestamp = logicalLocalClock.getTimestampAndIncrement();
+        }
     }
 
     public abstract void process(MessageProcessor messageProcessor);
@@ -23,5 +30,9 @@ public abstract class Message implements Serializable {
     public boolean isDelayed()
     {
         return false;
+    }
+
+    public Integer getLogicalTimestamp() {
+        return logicalTimestamp;
     }
 }

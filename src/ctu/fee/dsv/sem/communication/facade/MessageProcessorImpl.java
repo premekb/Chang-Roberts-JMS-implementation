@@ -266,14 +266,20 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processHeartbeatMessage(HeartbeatMessage heartbeatMessage) {
-        LoggingUtil.logReceivingMessage(log, heartbeatMessage, logicalLocalClock, "Responding to heartbeat");
+        if (node.shouldLogHeartbeat())
+        {
+            LoggingUtil.logReceivingMessage(log, heartbeatMessage, logicalLocalClock, "Responding to heartbeat");
+        }
 
-        messageSender.sendMessageToAddress(new HeartbeatMessageResponse(logicalLocalClock, node.getNodeAddress()), heartbeatMessage.senderNodeAddress);
+        messageSender.sendMessageToAddress(new HeartbeatMessageResponse(logicalLocalClock, node.getNodeAddress(), node.shouldLogHeartbeat()), heartbeatMessage.senderNodeAddress);
     }
 
     @Override
     public void processHeartbeatMessageResponse(HeartbeatMessageResponse heartbeatMessageResponse) {
-        LoggingUtil.logReceivingMessage(log, heartbeatMessageResponse, logicalLocalClock);
+        if (node.shouldLogHeartbeat())
+        {
+            LoggingUtil.logReceivingMessage(log, heartbeatMessageResponse, logicalLocalClock);
+        }
 
         heartbeatService.heartbeatReceived();
     }

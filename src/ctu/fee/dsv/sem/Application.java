@@ -47,12 +47,12 @@ public class Application {
     private static NodeConfiguration initNodeCfg(String[] args)
     {
         NodeConfiguration nodeCfg;
-        if (args.length == 4)
+        if (args.length == 5)
         {
             nodeCfg = NodeConfiguration.createWithLocalhostIp(args);
         }
 
-        else if (args.length == 5)
+        else if (args.length == 6)
         {
             nodeCfg = NodeConfiguration.create(args);
         }

@@ -2,6 +2,8 @@ package ctu.fee.dsv.sem.communication.wrapper;
 
 import ctu.fee.dsv.sem.NodeAddress;
 import ctu.fee.dsv.sem.ProducerClosingException;
+import ctu.fee.dsv.sem.communication.messages.HeartbeatMessage;
+import ctu.fee.dsv.sem.communication.messages.HeartbeatMessageResponse;
 import ctu.fee.dsv.sem.communication.messages.Message;
 import ctu.fee.dsv.sem.communication.util.QueueNameUtil;
 
@@ -17,12 +19,15 @@ public class MessageProducerImpl implements MessageProducer{
     private final String queueName;
 
     private final Session jmsSession;
-    public MessageProducerImpl(Session session, NodeAddress senderAddress, NodeAddress receiverAddress) {
+
+    private final boolean logHeartbeat;
+    public MessageProducerImpl(Session session, NodeAddress senderAddress, NodeAddress receiverAddress, boolean logHeartbeat) {
         try {
             jmsSession = session;
             queueName = QueueNameUtil.getQueueName(receiverAddress);
             Queue queue = new com.sun.messaging.Queue(queueName);
             jmsProducer = session.createProducer(queue);
+            this.logHeartbeat = logHeartbeat;
         } catch (JMSException e) {
             throw new RuntimeException(e);
         }
@@ -35,6 +40,12 @@ public class MessageProducerImpl implements MessageProducer{
             objectMessage.setObject(message);
 
             jmsProducer.send(objectMessage);
+
+            if ((message instanceof HeartbeatMessage || message instanceof HeartbeatMessageResponse) && !logHeartbeat)
+            {
+                return;
+            }
+
             log.info("SENT     " + message.toString() +  " To queue: " + queueName);
         } catch (JMSException e) {
             log.severe("FAILED   " + e.getMessage());

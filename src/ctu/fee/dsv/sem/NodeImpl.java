@@ -2,6 +2,7 @@ package ctu.fee.dsv.sem;
 
 import ctu.fee.dsv.sem.clock.LogicalLocalClock;
 import ctu.fee.dsv.sem.clock.LogicalLocalClockImpl;
+import ctu.fee.dsv.sem.cmdline.HeartbeatLogsConfigEnum;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
 import ctu.fee.dsv.sem.communication.facade.*;
 import ctu.fee.dsv.sem.communication.messages.election.ElectMessage;
@@ -24,6 +25,9 @@ import java.util.logging.Logger;
 public class NodeImpl implements Node, Runnable {
 
     private static final Logger log = Logger.getLogger(NodeImpl.class.toString());
+
+    private final boolean logHeartbeat;
+
     private StringSharedVariable sharedVariable;
 
     private SystemTopology systemTopology;
@@ -56,13 +60,14 @@ public class NodeImpl implements Node, Runnable {
 
 
     public NodeImpl(NodeConfiguration cfg, Connection connection) throws JMSException {
+        this.logHeartbeat = cfg.getHeartbeatLogsConfigEnum().shouldLog();
         this.logicalLocalClock = new LogicalLocalClockImpl();
         this.connection = connection;
         this.session = connection.createSession();
         address = new NodeAddress(cfg.getNodeName(), cfg.getId());
         initialNodeAddress = new NodeAddress(cfg.getLoginNodeName(), cfg.getLoginNodeId());
         neighbours = new Neighbours(address);
-        this.messageSender = new MessageSenderImpl(session, address, neighbours);
+        this.messageSender = new MessageSenderImpl(session, address, neighbours, shouldLogHeartbeat());
         this.messageReceiver = new MessageReceiverImpl(this, session);
         this.heartbeatService = new HeartbeatServiceImpl(messageSender, this, logicalLocalClock);
         this.messageProcessor = new MessageProcessorImpl(this, messageSender, heartbeatService, logicalLocalClock);
@@ -345,5 +350,10 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public boolean isLoggingOut() {
         return loggingOut;
+    }
+
+    @Override
+    public boolean shouldLogHeartbeat() {
+        return logHeartbeat;
     }
 }

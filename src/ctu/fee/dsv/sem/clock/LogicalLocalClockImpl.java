@@ -13,9 +13,9 @@ public class LogicalLocalClockImpl implements LogicalLocalClock {
 
     @Override
     public Integer getTimestampForReceivingMessage(Message message) {
-        if (message.logicalTimestamp > counter)
+        if (message.getLogicalTimestamp() != null && message.getLogicalTimestamp() > counter)
         {
-            counter = message.logicalTimestamp;
+            counter = message.getLogicalTimestamp();
         }
 
         return getTimestampAndIncrement();

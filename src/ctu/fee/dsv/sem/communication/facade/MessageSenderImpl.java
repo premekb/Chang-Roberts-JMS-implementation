@@ -22,13 +22,16 @@ public class MessageSenderImpl implements MessageSender {
 
     private MessageProducer producerForLeader;
 
-    public MessageSenderImpl(Session session, NodeAddress senderAddress, Neighbours neighbours) {
+    private final boolean logHeartbeat;
+
+    public MessageSenderImpl(Session session, NodeAddress senderAddress, Neighbours neighbours, boolean logHeartbeat) {
         this.session = session;
         this.senderAddress = senderAddress;
-        producerForNext = new MessageProducerImpl(session, senderAddress, neighbours.next);
-        producerForNextNext = new MessageProducerImpl(session, senderAddress, neighbours.nnext);
-        producerForPrev = new MessageProducerImpl(session, senderAddress, neighbours.prev);
-        producerForLeader = new MessageProducerImpl(session, senderAddress, neighbours.leader);
+        producerForNext = new MessageProducerImpl(session, senderAddress, neighbours.next, logHeartbeat);
+        producerForNextNext = new MessageProducerImpl(session, senderAddress, neighbours.nnext, logHeartbeat);
+        producerForPrev = new MessageProducerImpl(session, senderAddress, neighbours.prev, logHeartbeat);
+        producerForLeader = new MessageProducerImpl(session, senderAddress, neighbours.leader, logHeartbeat);
+        this.logHeartbeat = logHeartbeat;
     }
 
     @Override
@@ -38,10 +41,10 @@ public class MessageSenderImpl implements MessageSender {
         producerForPrev.close();
         producerForLeader.close();
 
-        producerForNext = new MessageProducerImpl(session, senderAddress, next);
-        producerForNextNext = new MessageProducerImpl(session, senderAddress, nnext);
-        producerForPrev = new MessageProducerImpl(session, senderAddress, prev);
-        producerForLeader = new MessageProducerImpl(session, senderAddress, leader);
+        producerForNext = new MessageProducerImpl(session, senderAddress, next, logHeartbeat);
+        producerForNextNext = new MessageProducerImpl(session, senderAddress, nnext, logHeartbeat);
+        producerForPrev = new MessageProducerImpl(session, senderAddress, prev, logHeartbeat);
+        producerForLeader = new MessageProducerImpl(session, senderAddress, leader, logHeartbeat);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class MessageSenderImpl implements MessageSender {
 
     @Override
     public void sendMessageToAddress(Message message, NodeAddress destinationAddress) {
-        MessageProducerImpl producer = new MessageProducerImpl(session, senderAddress, destinationAddress);
+        MessageProducerImpl producer = new MessageProducerImpl(session, senderAddress, destinationAddress, logHeartbeat);
         producer.sendMessage(message);
         producer.close();
     }

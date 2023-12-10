@@ -7,8 +7,8 @@ import ctu.fee.dsv.sem.communication.facade.MessageProcessor;
 public class HeartbeatMessage extends Message {
     public final NodeAddress senderNodeAddress;
 
-    public HeartbeatMessage(LogicalLocalClock logicalLocalClock, NodeAddress senderNodeAddress) {
-        super(logicalLocalClock);
+    public HeartbeatMessage(LogicalLocalClock logicalLocalClock, NodeAddress senderNodeAddress, boolean logHeartbeat) {
+        super(logicalLocalClock, logHeartbeat);
         this.senderNodeAddress = senderNodeAddress;
     }
 

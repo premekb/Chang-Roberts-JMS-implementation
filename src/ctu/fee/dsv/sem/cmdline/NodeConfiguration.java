@@ -13,13 +13,22 @@ public class NodeConfiguration {
 
     private final Integer loginNodeId;
 
-    public NodeConfiguration(Integer id, String nodeName, String brokerHostname, String brokerUrl, String loginNodeName, Integer loginNodeId) {
+    private final HeartbeatLogsConfigEnum heartbeatLogsConfigEnum;
+
+    public NodeConfiguration(Integer id,
+                             String nodeName,
+                             String brokerHostname,
+                             String brokerUrl,
+                             String loginNodeName,
+                             Integer loginNodeId,
+                             HeartbeatLogsConfigEnum heartbeatLogsConfigEnum) {
         this.id = id;
         this.nodeName = nodeName;
         this.brokerHostname = brokerHostname;
         this.brokerUrl = brokerUrl;
         this.loginNodeName = loginNodeName;
         this.loginNodeId = loginNodeId;
+        this.heartbeatLogsConfigEnum = heartbeatLogsConfigEnum;
     }
 
     public static NodeConfiguration createWithLocalhostIp(String[] cmdArgs)
@@ -30,7 +39,8 @@ public class NodeConfiguration {
                 "localhost",
                 "http://localhost/imq/tunnel",
                 cmdArgs[3],
-                Integer.parseInt(cmdArgs[2])
+                Integer.parseInt(cmdArgs[2]),
+                HeartbeatLogsConfigEnum.fromString(cmdArgs[4])
         );
     }
 
@@ -42,7 +52,8 @@ public class NodeConfiguration {
                 cmdArgs[4],
                 "http://" + cmdArgs[4] + "/imq/tunnel",
                 cmdArgs[3],
-                Integer.parseInt(cmdArgs[2])
+                Integer.parseInt(cmdArgs[2]),
+                HeartbeatLogsConfigEnum.fromString(cmdArgs[5])
         );
     }
 
@@ -68,5 +79,9 @@ public class NodeConfiguration {
 
     public Integer getLoginNodeId() {
         return loginNodeId;
+    }
+
+    public HeartbeatLogsConfigEnum getHeartbeatLogsConfigEnum() {
+        return heartbeatLogsConfigEnum;
     }
 }

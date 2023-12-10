@@ -12,7 +12,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
 
     private static final Logger log = Logger.getLogger(HeartbeatServiceImpl.class.toString());
 
-    private static final Integer CHECKING_PERIOD = 10_000;
+    private static final Integer CHECKING_PERIOD = 5_000;
     private final MessageSender messageSender;
 
     private final Node node;
@@ -42,7 +42,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
 
     private void startSendingHeartbeat() throws InterruptedException {
         try {
-            messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
+            messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress(), node.shouldLogHeartbeat()));
             Thread.sleep(CHECKING_PERIOD);
 
             while (true) {
@@ -52,7 +52,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
                     Thread.sleep(1000);
                 }
                 heartbeatResponseReceived = false;
-                messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress()));
+                messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress(), node.shouldLogHeartbeat()));
                 Thread.sleep(CHECKING_PERIOD);
             }
         }
