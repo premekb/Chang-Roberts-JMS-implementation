@@ -40,7 +40,6 @@ public class MessageConsumerImpl implements MessageConsumer {
 
             Object object = ((ObjectMessage) jmsMessage).getObject();
             Message message = (Message) object;
-            log.info("Received message. " + message.toString());
             return (Message) object;
         } catch (JMSException e) {
             log.severe("Failed to process message. " + e.getMessage());
