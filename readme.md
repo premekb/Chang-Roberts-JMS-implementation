@@ -34,6 +34,7 @@ node - next - next next - next next next - ...
 # Data uzlu
 - Vlastní adresa (= ID_NODU JMENO_NODU) a příslušný konzument
 - Je-li node leader
+- Hodnota proměnné pokud je leader
 - Zda-li node volí
 - Zda-li se node odhlašuje
 - Logický čas
