@@ -207,23 +207,34 @@ public class MessageProcessorImpl implements MessageProcessor {
 
     @Override
     public void processElectMessage(ElectMessage electMessage) {
+        boolean messageProcessed = false;
         LoggingUtil.logReceivingMessage(log, electMessage, logicalLocalClock);
 
         if (node.getNodeAddress().getNodeId() < electMessage.address.getNodeId() || node.isLoggingOut())
         {
             messageSender.sendMessageToNext(electMessage);
+            messageProcessed = true;
         }
 
         if (!node.isVoting() && node.getNodeAddress().getNodeId() > electMessage.address.getNodeId())
         {
             messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, node.getNodeAddress(), electMessage.isDelayed()));
+            messageProcessed = true;
         }
 
         if (node.getNodeAddress().getNodeId().equals(electMessage.address.getNodeId()))
         {
             ElectedMessage electedMessage = new ElectedMessage(logicalLocalClock, node.getNodeAddress(), electMessage.isDelayed());
             messageSender.sendMessageToNext(electedMessage);
+            messageProcessed = true;
         }
+
+        if (!messageProcessed)
+        {
+            log.severe("DISCARDING ELECT MESSAGE " + electMessage);
+        }
+
+        node.setVoting(true);
     }
 
     @Override
@@ -244,6 +255,8 @@ public class MessageProcessorImpl implements MessageProcessor {
             log.info("Forwarding elected message to the next node.");
             messageSender.sendMessageToNext(electedMessage);
         }
+
+        node.setVoting(false);
 
         if (node.isLoggingOut())
         {

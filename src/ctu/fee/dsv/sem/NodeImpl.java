@@ -208,7 +208,7 @@ public class NodeImpl implements Node, Runnable {
     public void processMessage(Message message) {
         if (message.isDelayed())
         {
-            int waitTime = RandomUtil.getRandomNumber(1000, 2000);
+            int waitTime = 4000;
             log.warning("Delaying " + message + " processing by " + waitTime + " ms.");
             try {
                 Thread.sleep(waitTime);
