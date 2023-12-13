@@ -108,7 +108,8 @@ public class NodeImpl implements Node, Runnable {
         loggingOut = true;
         if (neighbours.leader.equals(address))
         {
-            startElection(); // finishlogout gets called when a new leader is elected
+            messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, neighbours.prev, false)); // finishlogout gets called when a new leader is elected
+            setVoting(true);
         }
 
         else
