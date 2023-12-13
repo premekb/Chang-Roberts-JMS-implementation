@@ -25,4 +25,9 @@ public class ElectedMessage extends Message {
     public boolean isDelayed() {
         return delayed;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Leader id: " + leaderAddress.getNodeId();
+    }
 }

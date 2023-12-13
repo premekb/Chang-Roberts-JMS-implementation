@@ -253,7 +253,7 @@ public class MessageProcessorImpl implements MessageProcessor {
         if (!electedMessage.leaderAddress.equals(node.getNodeAddress()))
         {
             log.info("Forwarding elected message to the next node.");
-            messageSender.sendMessageToNext(electedMessage);
+            messageSender.sendMessageToNext(new ElectedMessage(logicalLocalClock, electedMessage.leaderAddress, electedMessage.isDelayed()));
         }
 
         node.setVoting(false);

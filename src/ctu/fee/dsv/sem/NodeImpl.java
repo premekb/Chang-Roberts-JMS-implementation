@@ -328,12 +328,14 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public void startElection() {
-        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev, false));
+        messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, address, false));
+        setVoting(true);
     }
 
     @Override
     public void startDelayedElection() {
-        processMessage(new ElectMessage(logicalLocalClock, getNeighbours().prev, true));
+        messageSender.sendMessageToNext(new ElectMessage(logicalLocalClock, address, true));
+        setVoting(true);
     }
 
     @Override

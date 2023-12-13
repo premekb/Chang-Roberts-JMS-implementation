@@ -25,4 +25,9 @@ public class ElectMessage extends Message {
     public boolean isDelayed() {
         return isDelayed;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Highest id: " + address.getNodeId();
+    }
 }
