@@ -49,7 +49,7 @@ public class HeartbeatServiceImpl implements HeartbeatService {
                 if (!heartbeatResponseReceived)
                 {
                     node.repairNextNodeMissing();
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 }
                 heartbeatResponseReceived = false;
                 messageSender.sendMessageToNext(new HeartbeatMessage(logicalLocalClock, node.getNodeAddress(), node.shouldLogHeartbeat()));
