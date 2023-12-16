@@ -12,8 +12,14 @@ java -jar artifact.jar 1 Alpha 2 Beta NO_HEARTBEAT_LOGS
 
 Broker jinde než localhost
 ```
-java -jar artifact.jar NODE_ID NODE_NAME NODE_ID_TO_LOGIN_TO NODE_NAME_TO_LOGIN_TO [NO_HEARTBEAT_LOGS/WITH_HEARTBEAT/LOGS] BROKER_IP_ADDRESS
+java -jar artifact.jar NODE_ID NODE_NAME NODE_ID_TO_LOGIN_TO NODE_NAME_TO_LOGIN_TO BROKER_IP_ADDRESS [NO_HEARTBEAT_LOGS/WITH_HEARTBEAT/LOGS]
 java -jar artifact.jar 1 Alpha 2 Beta 192.168.64.2 NO_HEARTBEAT_LOGS
+```
+
+2 brokeři v clusteru
+```
+java -jar artifact.jar NODE_ID NODE_NAME NODE_ID_TO_LOGIN_TO NODE_NAME_TO_LOGIN_TO BROKER_1_IP_ADDRESS BROKER_2_IP_ADDRESS [NO_HEARTBEAT_LOGS/WITH_HEARTBEAT/LOGS]
+java -jar artifact.jar 1 Alpha 2 Beta 192.168.64.2 192.168.64.5 NO_HEARTBEAT_LOGS
 ```
 
 Poslední argument určuje zda-li logovat periodické heartbeat message a trackovat u nich logický čas.

@@ -15,13 +15,16 @@ public class NodeConfiguration {
 
     private final HeartbeatLogsConfigEnum heartbeatLogsConfigEnum;
 
+    private final String addressList;
+
     public NodeConfiguration(Integer id,
                              String nodeName,
                              String brokerHostname,
                              String brokerUrl,
                              String loginNodeName,
                              Integer loginNodeId,
-                             HeartbeatLogsConfigEnum heartbeatLogsConfigEnum) {
+                             HeartbeatLogsConfigEnum heartbeatLogsConfigEnum,
+                             String addressList) {
         this.id = id;
         this.nodeName = nodeName;
         this.brokerHostname = brokerHostname;
@@ -29,6 +32,7 @@ public class NodeConfiguration {
         this.loginNodeName = loginNodeName;
         this.loginNodeId = loginNodeId;
         this.heartbeatLogsConfigEnum = heartbeatLogsConfigEnum;
+        this.addressList = addressList;
     }
 
     public static NodeConfiguration createWithLocalhostIp(String[] cmdArgs)
@@ -40,7 +44,8 @@ public class NodeConfiguration {
                 "http://localhost/imq/tunnel",
                 cmdArgs[3],
                 Integer.parseInt(cmdArgs[2]),
-                HeartbeatLogsConfigEnum.fromString(cmdArgs[4])
+                HeartbeatLogsConfigEnum.fromString(cmdArgs[4]),
+                "localhost:7676"
         );
     }
 
@@ -53,7 +58,22 @@ public class NodeConfiguration {
                 "http://" + cmdArgs[4] + "/imq/tunnel",
                 cmdArgs[3],
                 Integer.parseInt(cmdArgs[2]),
-                HeartbeatLogsConfigEnum.fromString(cmdArgs[5])
+                HeartbeatLogsConfigEnum.fromString(cmdArgs[5]),
+                cmdArgs[4] + ":7676"
+        );
+    }
+
+    public static NodeConfiguration createClusterConfiguration(String[] cmdArgs)
+    {
+        return new NodeConfiguration(
+                Integer.parseInt(cmdArgs[0]),
+                cmdArgs[1],
+                cmdArgs[4],
+                "http://" + cmdArgs[4] + "/imq/tunnel",
+                cmdArgs[3],
+                Integer.parseInt(cmdArgs[2]),
+                HeartbeatLogsConfigEnum.fromString(cmdArgs[6]),
+                cmdArgs[4] + ":7676," + cmdArgs[5] + ":7676"
         );
     }
 
@@ -83,5 +103,9 @@ public class NodeConfiguration {
 
     public HeartbeatLogsConfigEnum getHeartbeatLogsConfigEnum() {
         return heartbeatLogsConfigEnum;
+    }
+
+    public String getAddressList() {
+        return addressList;
     }
 }

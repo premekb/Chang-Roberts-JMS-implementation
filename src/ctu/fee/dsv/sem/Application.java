@@ -1,5 +1,6 @@
 package ctu.fee.dsv.sem;
 
+import com.sun.messaging.ConnectionConfiguration;
 import com.sun.messaging.ConnectionFactory;
 import ctu.fee.dsv.sem.cmdline.ConsoleHandler;
 import ctu.fee.dsv.sem.cmdline.NodeConfiguration;
@@ -37,8 +38,10 @@ public class Application {
     private static Connection initJmsConnection(NodeConfiguration nodeCfg) throws JMSException {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setProperty(IMQ_BROKER_HOST_NAME_KEY, nodeCfg.getBrokerHostname());
+        connectionFactory.setProperty(ConnectionConfiguration.imqAddressList, nodeCfg.getAddressList());
         connectionFactory.setProperty(IMQ_CONNECTION_URL_KEY, nodeCfg.getBrokerUrl());
         connectionFactory.setProperty(IMQ_ACK_TIMEOUT_KEY, IMQ_ACK_TIMEOUT_VALUE);
+        connectionFactory.setProperty(ConnectionConfiguration.imqReconnectEnabled, "true");
         Connection connection = connectionFactory.createConnection();
         connection.start();
         return connection;
@@ -55,6 +58,11 @@ public class Application {
         else if (args.length == 6)
         {
             nodeCfg = NodeConfiguration.create(args);
+        }
+
+        else if (args.length == 7)
+        {
+            nodeCfg = NodeConfiguration.createClusterConfiguration(args);
         }
 
         else {
